@@ -21,7 +21,7 @@ func InitConfig() *AppConfig {
 	var app *AppConfig
 
 	app = GetConfig()
-	if app == nil {
+	if app != nil {
 		log.Fatal("Cannot init config")
 		return nil
 	}
@@ -30,7 +30,7 @@ func InitConfig() *AppConfig {
 
 func GetConfig() *AppConfig {
 	var res AppConfig
-	err := godotenv.Load(".env")
+	err := godotenv.Load("local.env")
 
 	if err != nil {
 		log.Fatal("Cannot open config file")
