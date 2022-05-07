@@ -1,7 +1,8 @@
 package main
 
 import (
-	"gorm.io/gorm"
+	"fmt"
+	"together/be8/config"
 )
 
 func main() {

@@ -21,7 +21,7 @@ func InitConfig() *AppConfig {
 	var app *AppConfig
 
 	app = GetConfig()
-	if app != nil {
+	if app == nil {
 		log.Fatal("Cannot init config")
 		return nil
 	}
@@ -36,17 +36,13 @@ func GetConfig() *AppConfig {
 		log.Fatal("Cannot open config file")
 		return nil
 	}
-	portconv, err := strconv.Atoi(os.Getenv("PORT"))
-	if err != nil {
-		log.Warn(err)
-	}
+	portconv, _ := strconv.Atoi(os.Getenv("PORT"))
 	res.Port = int16(portconv)
 	conv, _ := strconv.Atoi(os.Getenv("DBPORT"))
 	res.DBPort = int16(conv)
 	res.Host = os.Getenv("HOST")
-	res.User = os.Getenv("USER")
+	res.User = os.Getenv("NAMEUSER")
 
 	res.DBName = os.Getenv("DBNAME")
-
 	return &res
 }

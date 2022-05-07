@@ -9,7 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitDB(config AppConfig) *gorm.DB {
+func InitDB() *gorm.DB {
+	config := InitConfig()
 	fmt.Printf("%v", config)
 	conString := fmt.Sprintf("%s:@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
 		config.User,
