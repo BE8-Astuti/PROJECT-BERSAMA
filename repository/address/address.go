@@ -22,7 +22,7 @@ func NewDB(db *gorm.DB) *AddressDB {
 // CREATE NEW ADDRESS TO DATABASE
 func (a *AddressDB) CreateAddress(newAdd entities.Address) (entities.Address, error) {
 	if err := a.Db.Create(&newAdd).Error; err != nil {
-		log.Fatal(err)
+		log.Warn(err)
 		return newAdd, err
 	}
 	return newAdd, nil

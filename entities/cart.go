@@ -8,4 +8,5 @@ type Cart struct {
 	NameProduct string `json:"nameProduct"`
 	Qty         int    `json:"qty"`
 	Price       int    `json:"price"`
+	ToBuy       bool   `json:"toBuy"`
 }

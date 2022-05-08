@@ -27,5 +27,6 @@ func InitDB() *gorm.DB {
 }
 func Migrate() {
 	db := InitDB()
-	db.AutoMigrate(&entities.User{}, &entities.Address{})
+	// db.AutoMigrate(&entities.User{}, &entities.Address{})
+	db.AutoMigrate(&entities.Cart{})
 }
