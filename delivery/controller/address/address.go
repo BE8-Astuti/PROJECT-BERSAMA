@@ -101,29 +101,16 @@ func (r *ControlAddress) UpdateAddress() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
-		UpdateAddress := entities.Address{}
+		UpdateAddress := entities.Address{
+			Recipient:    update.Recipient,
+			HP:           update.HP,
+			Street:       update.Street,
+			UrbanVillage: update.UrbanVillage,
+			SubDistrict:  update.SubDistrict,
+			City:         update.City,
+			Zip:          update.Zip,
+		}
 
-		if update.Recipient != "" {
-			UpdateAddress.Recipient = update.Recipient
-		}
-		if update.HP != "" {
-			UpdateAddress.HP = update.HP
-		}
-		if update.Street != "" {
-			UpdateAddress.Street = update.Street
-		}
-		if update.UrbanVillage != "" {
-			UpdateAddress.UrbanVillage = update.UrbanVillage
-		}
-		if update.SubDistrict != "" {
-			UpdateAddress.SubDistrict = update.SubDistrict
-		}
-		if update.City != "" {
-			UpdateAddress.City = update.City
-		}
-		if update.Zip != "" {
-			UpdateAddress.Zip = update.Zip
-		}
 		result, errNotFound := r.Repo.UpdateAddress(uint(idAddress), UpdateAddress)
 		if errNotFound != nil {
 			log.Warn(errNotFound)

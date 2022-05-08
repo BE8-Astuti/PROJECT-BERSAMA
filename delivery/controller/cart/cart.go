@@ -91,7 +91,6 @@ func (r *ControlCart) GetAllCart() echo.HandlerFunc {
 			res = append(res, data)
 			fmt.Println(res)
 		}
-
 		return c.JSON(http.StatusOK, cartV.StatusGetAllOk(res, totalbill))
 	}
 }
@@ -127,20 +126,7 @@ func (r *ControlCart) UpdateCart() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
-		Updatecart := entities.Cart{}
-
-		if update.NameSeller != "" {
-			Updatecart.NameSeller = update.NameSeller
-		}
-		if update.NameProduct != "" {
-			Updatecart.NameProduct = update.NameProduct
-		}
-		if update.Qty != 0 {
-			Updatecart.Qty = update.Qty
-		}
-		if update.Price != 0 {
-			Updatecart.Price = update.Price
-		}
+		Updatecart := entities.Cart{Qty: update.Qty}
 
 		result, errNotFound := r.Repo.UpdateCart(uint(idcart), Updatecart)
 		if errNotFound != nil {
