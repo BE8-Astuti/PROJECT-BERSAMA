@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"together/be8/config"
 	cAddress "together/be8/delivery/controller/address"
 	cCart "together/be8/delivery/controller/cart"
@@ -30,18 +28,13 @@ func main() {
 	cartRepo := cart.NewRepoCart(database)
 	cartControl := cCart.NewControlCart(cartRepo, validator.New())
 
+	userRepo := userRepo.New(database)
+	userControl := controllerus.New(userRepo, validator.New())
+
 	// Initiate Echo
 	e := echo.New()
 	// Akses Path Address
-	routes.Path(e, AddressControl, cartControl)
+	routes.Path(e, userRepo, AddressControl, cartControl)
 	e.Logger.Fatal(e.Start(":8000"))
-	conf := config.InitConfig()
-	db := config.InitDB(*conf)
-	config.Migrate(db)
-	e := echo.New()
 
-	repo := userRepo.New(db)
-	controller := controllerus.New(repo, validator.New())
-	routes.RegisterPath(e, controller)
-	log.Fatal(e.Start(fmt.Sprintf(":%d", conf.Port)))
 }
