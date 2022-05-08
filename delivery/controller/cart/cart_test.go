@@ -1,4 +1,4 @@
-package address
+package cart
 
 import (
 	"encoding/json"
@@ -21,22 +21,21 @@ var token string
 // INITIATE TOKEN
 func TestCreateToken(t *testing.T) {
 	t.Run("Create Token", func(t *testing.T) {
-		token, _ = middlewares.CreateToken(1, "Galih", "Galih@gmail.com")
+		token, _ = middlewares.CreateToken(1, "Motor", "Motor@gmail.com")
 	})
 }
 
 // TEST METHODE CREATE_ADDRESS
-func TestCreateAddress(t *testing.T) {
+func TestCreateCart(t *testing.T) {
 	t.Run("Create Success", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
-			"recipient":    "Galih",
-			"hp":           "21343555",
-			"street":       "Jl Buntu",
-			"subDistrict":  "Bangun Rejo",
-			"UrbanVillage": "Pagar Alam Utara",
-			"City":         "Pagar Alam",
-			"zip":          "23413",
+			"productId":   3,
+			"nameSeller":  "Elec Center",
+			"nameProduct": "Mouse",
+			"qty":         3,
+			"price":       100000,
+			"toBuy":       "yes",
 		})
 
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
@@ -45,10 +44,10 @@ func TestCreateAddress(t *testing.T) {
 
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address")
-		AddressC := NewControlAddress(&mockAddress{}, validator.New())
+		context.SetPath("/cart")
+		CartC := NewControlCart(&mockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(AddressC.CreateAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(CartC.CreateCart())(context)
 
 		type Response struct {
 			Code    int
@@ -61,30 +60,29 @@ func TestCreateAddress(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &result)
 
 		assert.Equal(t, 201, result.Code)
-		assert.Equal(t, "Success Create Address", result.Message)
+		assert.Equal(t, "Success Create Cart", result.Message)
 		assert.True(t, result.Status)
 		assert.NotNil(t, result.Data)
 	})
 	t.Run("Error Access Database", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
-			"recipient":    "Galih",
-			"hp":           "21343555",
-			"street":       "Jl Buntu",
-			"subDistrict":  "Bangun Rejo",
-			"UrbanVillage": "Pagar Alam Utara",
-			"City":         "Pagar Alam",
-			"zip":          "23413",
+			"productId":   3,
+			"nameSeller":  "Elec Center",
+			"nameProduct": "Mouse",
+			"qty":         3,
+			"price":       100000,
+			"toBuy":       "yes",
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address")
-		AddressC := NewControlAddress(&errMockAddress{}, validator.New())
+		context.SetPath("/cart")
+		CartC := NewControlCart(&errMockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(AddressC.CreateAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(CartC.CreateCart())(context)
 
 		type Response struct {
 			Code    int
@@ -107,10 +105,10 @@ func TestCreateAddress(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address")
-		AddressC := NewControlAddress(&errMockAddress{}, validator.New())
+		context.SetPath("/cart")
+		CartC := NewControlCart(&errMockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(AddressC.CreateAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(CartC.CreateCart())(context)
 
 		type Response struct {
 			Code    int
@@ -127,19 +125,20 @@ func TestCreateAddress(t *testing.T) {
 	t.Run("Error Validate", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
-			"recipient": "Galih",
-			"hp":        "21343555",
-			"street":    "Jl Buntu",
+			"productId":   3,
+			"nameSeller":  "Elec Center",
+			"nameProduct": "Mouse",
+			"qty":         3,
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address")
-		AddressC := NewControlAddress(&errMockAddress{}, validator.New())
+		context.SetPath("/cart")
+		CartC := NewControlCart(&errMockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(AddressC.CreateAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(CartC.CreateCart())(context)
 
 		type Response struct {
 			Code    int
@@ -157,8 +156,8 @@ func TestCreateAddress(t *testing.T) {
 }
 
 // TEST GET ALL ADDRESS
-func TestGetAllAddress(t *testing.T) {
-	t.Run("Success Get All Address", func(t *testing.T) {
+func TestGetAllCart(t *testing.T) {
+	t.Run("Success Get All Cart", func(t *testing.T) {
 		e := echo.New()
 
 		req := httptest.NewRequest(http.MethodPost, "/", nil)
@@ -166,10 +165,10 @@ func TestGetAllAddress(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address")
-		GetAddress := NewControlAddress(&mockAddress{}, validator.New())
+		context.SetPath("/cart")
+		GetCart := NewControlCart(&mockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.GetAllAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.GetAllCart())(context)
 
 		type Response struct {
 			Code    int
@@ -194,10 +193,10 @@ func TestGetAllAddress(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address")
-		GetAddress := NewControlAddress(&errMockAddress{}, validator.New())
+		context.SetPath("/cart")
+		GetCart := NewControlCart(&errMockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.GetAllAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.GetAllCart())(context)
 
 		type Response struct {
 			Code    int
@@ -215,20 +214,20 @@ func TestGetAllAddress(t *testing.T) {
 }
 
 // TEST GET ADDRESS BY ID
-func TestGetAddressID(t *testing.T) {
-	t.Run("Success Get Address By ID", func(t *testing.T) {
+func TestGetCartID(t *testing.T) {
+	t.Run("Success Get Cart By ID", func(t *testing.T) {
 		e := echo.New()
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address/:id")
+		context.SetPath("/cart/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("1")
-		GetAddress := NewControlAddress(&mockAddress{}, validator.New())
+		GetCart := NewControlCart(&mockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.GetAddressID())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.GetCartID())(context)
 
 		type Response struct {
 			Code    int
@@ -253,12 +252,12 @@ func TestGetAddressID(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address/:id")
+		context.SetPath("/cart/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("1")
-		GetAddress := NewControlAddress(&errMockAddress{}, validator.New())
+		GetCart := NewControlCart(&errMockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.GetAddressID())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.GetCartID())(context)
 
 		type Response struct {
 			Code    int
@@ -281,12 +280,12 @@ func TestGetAddressID(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address/:id")
+		context.SetPath("/cart/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("C")
-		GetAddress := NewControlAddress(&errMockAddress{}, validator.New())
+		GetCart := NewControlCart(&errMockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.GetAddressID())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.GetCartID())(context)
 
 		type Response struct {
 			Code    int
@@ -304,29 +303,24 @@ func TestGetAddressID(t *testing.T) {
 }
 
 // TEST UPDATE ADDRESS BY ID
-func TestUpdateAddress(t *testing.T) {
+func TestUpdateCart(t *testing.T) {
 	t.Run("Update Success", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
-			"recipient":    "Galih",
-			"hp":           "21343555",
-			"street":       "Jl Buntu",
-			"subDistrict":  "Bangun Rejo",
-			"UrbanVillage": "Pagar Alam Utara",
-			"City":         "Pagar Alam",
-			"zip":          "23413",
+			"qty":   7,
+			"toBuy": "no",
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address/:id")
+		context.SetPath("/cart/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("1")
-		GetAddress := NewControlAddress(&mockAddress{}, validator.New())
+		GetCart := NewControlCart(&mockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.UpdateAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.UpdateCart())(context)
 
 		type Response struct {
 			Code    int
@@ -351,12 +345,12 @@ func TestUpdateAddress(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address/:id")
+		context.SetPath("/cart/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("7")
-		GetAddress := NewControlAddress(&errMockAddress{}, validator.New())
+		GetCart := NewControlCart(&errMockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.UpdateAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.UpdateCart())(context)
 
 		type Response struct {
 			Code    int
@@ -379,12 +373,12 @@ func TestUpdateAddress(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address/:id")
+		context.SetPath("/cart/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("7")
-		AddressC := NewControlAddress(&errMockAddress{}, validator.New())
+		CartC := NewControlCart(&errMockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(AddressC.UpdateAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(CartC.UpdateCart())(context)
 
 		type Response struct {
 			Code    int
@@ -406,12 +400,12 @@ func TestUpdateAddress(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address/:id")
+		context.SetPath("/cart/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("C")
-		GetAddress := NewControlAddress(&errMockAddress{}, validator.New())
+		GetCart := NewControlCart(&errMockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.UpdateAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.UpdateCart())(context)
 
 		type Response struct {
 			Code    int
@@ -429,8 +423,8 @@ func TestUpdateAddress(t *testing.T) {
 }
 
 // TEST DELETE ADDRESS BY ID
-func TestDeleteAddress(t *testing.T) {
-	t.Run("Success Delete Address", func(t *testing.T) {
+func TestDeleteCart(t *testing.T) {
+	t.Run("Success Delete Cart", func(t *testing.T) {
 		e := echo.New()
 
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -438,12 +432,12 @@ func TestDeleteAddress(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address/:id")
+		context.SetPath("/cart/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("7")
-		GetAddress := NewControlAddress(&mockAddress{}, validator.New())
+		GetCart := NewControlCart(&mockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.DeleteAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.DeleteCart())(context)
 
 		type Response struct {
 			Code    int
@@ -458,7 +452,7 @@ func TestDeleteAddress(t *testing.T) {
 		assert.Equal(t, "Deleted", result.Message)
 		assert.True(t, result.Status)
 	})
-	t.Run("Error Delete Address", func(t *testing.T) {
+	t.Run("Error Delete Cart", func(t *testing.T) {
 		e := echo.New()
 
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -466,12 +460,12 @@ func TestDeleteAddress(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address/:id")
+		context.SetPath("/cart/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("7")
-		GetAddress := NewControlAddress(&errMockAddress{}, validator.New())
+		GetCart := NewControlCart(&errMockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.DeleteAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.DeleteCart())(context)
 
 		type Response struct {
 			Code    int
@@ -494,12 +488,12 @@ func TestDeleteAddress(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address/:id")
+		context.SetPath("/cart/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("C")
-		GetAddress := NewControlAddress(&errMockAddress{}, validator.New())
+		GetCart := NewControlCart(&errMockCart{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.DeleteAddress())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.DeleteCart())(context)
 
 		type Response struct {
 			Code    int
@@ -517,48 +511,48 @@ func TestDeleteAddress(t *testing.T) {
 }
 
 // MOCK SUCCESS
-type mockAddress struct {
+type mockCart struct {
 }
 
 //METHOD MOCK SUCCESS
-func (m *mockAddress) CreateAddress(newAdd entities.Address) (entities.Address, error) {
-	return entities.Address{Recipient: "Galih", HP: "123456"}, nil
+func (m *mockCart) CreateCart(newAdd entities.Cart) (entities.Cart, error) {
+	return entities.Cart{NameProduct: "Motor", NameSeller: "Otomotif Center"}, nil
 }
-func (m *mockAddress) GetAllAddress(UserID uint) ([]entities.Address, error) {
-	return []entities.Address{{Recipient: "Galih", HP: "123456"}, {Recipient: "Nando", HP: "433112"}}, nil
+func (m *mockCart) GetAllCart(UserID uint) ([]entities.Cart, []string, error) {
+	return []entities.Cart{{NameProduct: "Motor", NameSeller: "Otomotif Center", ToBuy: "yes", Qty: 2, Price: 20000}, {NameProduct: "Mobil", NameSeller: "Otomotif Center"}}, []string{"Otomotif Center"}, nil
 }
-func (m *mockAddress) GetAddressID(x uint, UserID uint) (entities.Address, error) {
-	return entities.Address{Recipient: "Galih", HP: "123456"}, nil
+func (m *mockCart) GetCartID(x uint, UserID uint) (entities.Cart, error) {
+	return entities.Cart{NameProduct: "Motor", NameSeller: "Otomotif Center"}, nil
 }
-func (m *mockAddress) UpdateAddress(id uint, updatedAddress entities.Address, UserID uint) (entities.Address, error) {
-	return entities.Address{Recipient: "Galih", HP: "123456"}, nil
+func (m *mockCart) UpdateCart(id uint, updatedCart entities.Cart, UserID uint) (entities.Cart, error) {
+	return entities.Cart{NameProduct: "Motor", NameSeller: "Otomotif Center"}, nil
 }
 
-func (m *mockAddress) DeleteAddress(id uint, UserID uint) error {
+func (m *mockCart) DeleteCart(id uint, UserID uint) error {
 	return nil
 }
 
 // MOCK ERROR
-type errMockAddress struct {
+type errMockCart struct {
 }
 
 // METHOD MOCK ERROR
-func (e *errMockAddress) CreateAddress(newAdd entities.Address) (entities.Address, error) {
-	return entities.Address{}, errors.New("Access Database Error")
+func (e *errMockCart) CreateCart(newAdd entities.Cart) (entities.Cart, error) {
+	return entities.Cart{}, errors.New("Access Database Error")
 }
 
-func (e *errMockAddress) GetAllAddress(UserID uint) ([]entities.Address, error) {
-	return nil, errors.New("Access Database Error")
+func (e *errMockCart) GetAllCart(UserID uint) ([]entities.Cart, []string, error) {
+	return nil, []string{}, errors.New("Access Database Error")
 }
 
-func (e *errMockAddress) GetAddressID(x uint, UserID uint) (entities.Address, error) {
-	return entities.Address{}, errors.New("Access Database Error")
+func (e *errMockCart) GetCartID(x uint, UserID uint) (entities.Cart, error) {
+	return entities.Cart{}, errors.New("Access Database Error")
 }
 
-func (e *errMockAddress) UpdateAddress(id uint, updatedAddress entities.Address, UserID uint) (entities.Address, error) {
-	return entities.Address{}, errors.New("Access Database Error")
+func (e *errMockCart) UpdateCart(id uint, updatedCart entities.Cart, UserID uint) (entities.Cart, error) {
+	return entities.Cart{}, errors.New("Access Database Error")
 }
 
-func (e *errMockAddress) DeleteAddress(id uint, UserID uint) error {
+func (e *errMockCart) DeleteCart(id uint, UserID uint) error {
 	return errors.New("Access Database Error")
 }

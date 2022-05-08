@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Address struct {
 	gorm.Model
-	// UserID       uint
+	UserID       uint
 	Recipient    string `gorm:"recipient"`
 	HP           string `gorm:"hp"`
 	Street       string `gorm:"street"`

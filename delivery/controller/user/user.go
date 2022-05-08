@@ -1,16 +1,13 @@
 package user
 
 import (
+	"net/http"
 	"strconv"
-	"time"
+	jwt "together/be8/delivery/middleware"
 	"together/be8/delivery/view"
 	userview "together/be8/delivery/view/user"
-	ruser "together/be8/repository/user"
-
-	"net/http"
 	"together/be8/entities"
-
-	"github.com/golang-jwt/jwt"
+	ruser "together/be8/repository/user"
 
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
@@ -42,7 +39,7 @@ func (uc *UserController) InsertUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, userview.BadRequest())
 	}
 
-	newUser := entities.User{Name: tmpUser.Name, Email: tmpUser.Email, Password: tmpUser.Password, Phone: tmpUser.Phone, Status: tmpUser.Status}
+	newUser := entities.User{Name: tmpUser.Name, Email: tmpUser.Email, Password: tmpUser.Password, Phone: tmpUser.Phone}
 	res, err := uc.Repo.InsertUser(newUser)
 
 	if err != nil {
@@ -143,7 +140,7 @@ func (uc *UserController) Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, userview.BadRequest())
 	}
 
-	if err := uc.Valid.Struct(param); err != nil {
+	if err := uc.Valid.Struct(&param); err != nil {
 		log.Warn(err.Error())
 		return c.JSON(http.StatusBadRequest, userview.BadRequest())
 	}
@@ -158,12 +155,12 @@ func (uc *UserController) Login(c echo.Context) error {
 	res := userview.LoginResponse{}
 
 	if res.Token == "" {
-		token, _ := CreateToken(int(hasil.ID), (hasil.Name), (hasil.Email), (hasil.Status))
+		token, _ := jwt.CreateToken(int(hasil.ID), (hasil.Name), (hasil.Email))
 		res.Token = token
-		return c.JSON(http.StatusOK, view.StatusOK(res, "Berhasil login"))
+		return c.JSON(http.StatusOK, userview.LoginOK(res, "Berhasil login"))
 	}
 
-	return c.JSON(http.StatusOK, view.OK(res, "Berhasil login"))
+	return c.JSON(http.StatusOK, userview.LoginOK(res, "Berhasil login"))
 }
 
 func (uc *UserController) DeleteUserID(c echo.Context) error {
@@ -188,57 +185,4 @@ func (uc *UserController) DeleteUserID(c echo.Context) error {
 		"status":  true,
 		"data":    res,
 	})
-}
-
-func CreateToken(userId int, name, email, status string) (string, error) {
-	claims := jwt.MapClaims{}
-
-	claims["userId"] = userId
-	claims["name"] = name
-	claims["email"] = email
-	claims["status"] = status
-
-	claims["expired"] = time.Now().Add(time.Hour * 3).Unix() //Token expires after 1 hour
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte("TOGETHER"))
-}
-
-func ExtractTokenUserId(e echo.Context) float64 {
-	user := e.Get("user").(*jwt.Token)
-	if user.Valid {
-		claims := user.Claims.(jwt.MapClaims)
-		userId := claims["userId"].(float64)
-		return userId
-	}
-	return 0
-}
-
-func ExtractTokenName(e echo.Context) string {
-	name := e.Get("user").(*jwt.Token)
-	if name.Valid {
-		claims := name.Claims.(jwt.MapClaims)
-		name := claims["name"].(string)
-		return name
-	}
-	return ""
-}
-
-func ExtractTokenEmail(e echo.Context) string {
-	email := e.Get("user").(*jwt.Token)
-	if email.Valid {
-		claims := email.Claims.(jwt.MapClaims)
-		email := claims["email"].(string)
-		return email
-	}
-	return ""
-}
-
-func ExtractTokenStatus(e echo.Context) string {
-	status := e.Get("user").(*jwt.Token)
-	if status.Valid {
-		claims := status.Claims.(jwt.MapClaims)
-		status := claims["status"].(string)
-		return status
-	}
-	return ""
 }

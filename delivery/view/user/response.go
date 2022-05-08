@@ -27,6 +27,11 @@ func BadRequest() map[string]interface{} {
 	}
 }
 
-func LoginOK() map[string]interface{} {
-	return map[string]interface{}{}
+func LoginOK(data LoginResponse, message string) map[string]interface{} {
+	return map[string]interface{}{
+		"code":    http.StatusOK,
+		"message": message,
+		"status":  true,
+		"data":    data,
+	}
 }

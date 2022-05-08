@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	middlewares "together/be8/delivery/middleware"
 	"together/be8/delivery/view"
 	cartV "together/be8/delivery/view/cart"
+
 	"together/be8/entities"
 	"together/be8/repository/cart"
 
@@ -27,7 +29,7 @@ func NewControlCart(NewCart cart.CartRepository, validate *validator.Validate) *
 	}
 }
 
-// METHOD Add New cart
+// ADD NEW CART
 func (r *ControlCart) CreateCart() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var Insert cartV.InsertCart
@@ -40,8 +42,10 @@ func (r *ControlCart) CreateCart() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.Validate())
 		}
+		UserID := middlewares.ExtractTokenUserId(c)
 		NewAdd := entities.Cart{
-			// UserID:       1,
+			UserID:      uint(UserID),
+			ProductID:   Insert.ProductID,
 			NameSeller:  Insert.NameSeller,
 			NameProduct: Insert.NameProduct,
 			Qty:         Insert.Qty,
@@ -57,10 +61,11 @@ func (r *ControlCart) CreateCart() echo.HandlerFunc {
 	}
 }
 
-// METHOD GET ALL cart
+// METHOD GET ALL CART
 func (r *ControlCart) GetAllCart() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		result, seller, err := r.Repo.GetAllCart()
+		UserID := middlewares.ExtractTokenUserId(c)
+		result, seller, err := r.Repo.GetAllCart(uint(UserID))
 		if err != nil {
 			log.Warn(err)
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
@@ -78,7 +83,7 @@ func (r *ControlCart) GetAllCart() echo.HandlerFunc {
 					addProduct = append(addProduct, product)
 				}
 				if _, ok := cek[v.ID]; !ok {
-					if v.ToBuy == true {
+					if v.ToBuy == "yes" {
 						bill := v.Price * v.Qty
 						totalbill += bill
 					}
@@ -95,7 +100,7 @@ func (r *ControlCart) GetAllCart() echo.HandlerFunc {
 	}
 }
 
-// METHOD GET cart BY ID
+// METHOD GET CART BY ID
 func (r *ControlCart) GetCartID() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
@@ -104,7 +109,8 @@ func (r *ControlCart) GetCartID() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
-		result, errGetcartID := r.Repo.GetCartID(uint(idcart))
+		UserID := middlewares.ExtractTokenUserId(c)
+		result, errGetcartID := r.Repo.GetCartID(uint(idcart), uint(UserID))
 		if errGetcartID != nil {
 			log.Warn(errGetcartID)
 			return c.JSON(http.StatusNotFound, view.NotFound())
@@ -113,10 +119,10 @@ func (r *ControlCart) GetCartID() echo.HandlerFunc {
 	}
 }
 
-// UPDATE cart BY ID
+// UPDATE CART BY ID
 func (r *ControlCart) UpdateCart() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var update cartV.InsertCart
+		var update cartV.UpdateCart
 		if err := c.Bind(&update); err != nil {
 			return c.JSON(http.StatusUnsupportedMediaType, view.BindData())
 		}
@@ -126,9 +132,9 @@ func (r *ControlCart) UpdateCart() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
-		Updatecart := entities.Cart{Qty: update.Qty}
-
-		result, errNotFound := r.Repo.UpdateCart(uint(idcart), Updatecart)
+		UpdateCart := entities.Cart{Qty: update.Qty, ToBuy: update.ToBuy}
+		UserID := middlewares.ExtractTokenUserId(c)
+		result, errNotFound := r.Repo.UpdateCart(uint(idcart), UpdateCart, uint(UserID))
 		if errNotFound != nil {
 			log.Warn(errNotFound)
 			return c.JSON(http.StatusNotFound, view.NotFound())
@@ -137,7 +143,7 @@ func (r *ControlCart) UpdateCart() echo.HandlerFunc {
 	}
 }
 
-// DELETE cart BY ID
+// DELETE CART BY ID
 func (r *ControlCart) DeleteCart() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
@@ -146,7 +152,10 @@ func (r *ControlCart) DeleteCart() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
-		errDelete := r.Repo.DeleteCart(uint(idcart))
+
+		UserID := middlewares.ExtractTokenUserId(c)
+
+		errDelete := r.Repo.DeleteCart(uint(idcart), uint(UserID))
 		if errDelete != nil {
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}

@@ -11,7 +11,6 @@ import (
 
 func InitDB() *gorm.DB {
 	config := InitConfig()
-	fmt.Printf("%v", config)
 	conString := fmt.Sprintf("%s:@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
 		config.User,
 		config.Host,
@@ -27,6 +26,5 @@ func InitDB() *gorm.DB {
 }
 func Migrate() {
 	db := InitDB()
-	// db.AutoMigrate(&entities.User{}, &entities.Address{})
-	db.AutoMigrate(&entities.Cart{})
+	db.AutoMigrate(&entities.User{}, &entities.Address{}, &entities.Cart{}, &entities.Category{}, entities.Product{})
 }

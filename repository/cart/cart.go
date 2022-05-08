@@ -29,17 +29,17 @@ func (r *RepoCart) CreateCart(NewCart entities.Cart) (entities.Cart, error) {
 }
 
 // GET ALL Cart IN DATABASE
-func (r *RepoCart) GetAllCart() ([]entities.Cart, []string, error) {
+func (r *RepoCart) GetAllCart(UserID uint) ([]entities.Cart, []string, error) {
 	var AllCart []entities.Cart
 
 	test := []string{}
-
-	if err := r.Db.Table("carts").Select("name_seller").Distinct("name_seller").Order("created_at DESC").Find(&test).Error; err != nil {
+	fmt.Println(UserID)
+	if err := r.Db.Table("carts").Where("user_id = ?", UserID).Select("name_seller").Distinct("name_seller").Order("created_at DESC").Find(&test).Error; err != nil {
 		log.Warn("Error Get All Cart", err)
 		return AllCart, test, errors.New("Access Database Error")
 	}
-	fmt.Println(test)
-	if err := r.Db.Find(&AllCart).Error; err != nil {
+
+	if err := r.Db.Where("user_id = ?", UserID).Find(&AllCart).Error; err != nil {
 		log.Warn("Error Get All Cart", err)
 		return AllCart, test, errors.New("Access Database Error")
 	}
@@ -47,9 +47,9 @@ func (r *RepoCart) GetAllCart() ([]entities.Cart, []string, error) {
 }
 
 // GET Cart BY ID
-func (r *RepoCart) GetCartID(id uint) (entities.Cart, error) {
+func (r *RepoCart) GetCartID(id uint, UserID uint) (entities.Cart, error) {
 	var Cart entities.Cart
-	if err := r.Db.Where("id = ?", id).First(&Cart).Error; err != nil {
+	if err := r.Db.Where("id = ? AND user_id = ?", id, UserID).First(&Cart).Error; err != nil {
 		log.Warn("Error Get Cart By ID", err)
 		return Cart, errors.New("Access Database Error")
 	}
@@ -58,10 +58,10 @@ func (r *RepoCart) GetCartID(id uint) (entities.Cart, error) {
 }
 
 // UPDATE Cart BY ID
-func (r *RepoCart) UpdateCart(id uint, updatedCart entities.Cart) (entities.Cart, error) {
+func (r *RepoCart) UpdateCart(id uint, updatedCart entities.Cart, UserID uint) (entities.Cart, error) {
 	var updated entities.Cart
 
-	if err := r.Db.Where("id =?", id).First(&updated).Updates(&updatedCart).Find(&updated).Error; err != nil {
+	if err := r.Db.Table("carts").Where("id =? AND user_id =?", id, UserID).Updates(&updatedCart).First(&updated).Error; err != nil {
 		log.Warn("Update Cart Error", err)
 		return updated, errors.New("Access Database Error")
 	}
@@ -70,10 +70,10 @@ func (r *RepoCart) UpdateCart(id uint, updatedCart entities.Cart) (entities.Cart
 }
 
 // DELETE Cart BY ID
-func (r *RepoCart) DeleteCart(id uint) error {
+func (r *RepoCart) DeleteCart(id uint, UserID uint) error {
 
 	var delete entities.Cart
-	if err := r.Db.Where("id = ?", id).First(&delete).Delete(&delete).Error; err != nil {
+	if err := r.Db.Where("id = ? AND user_id = ?", id, UserID).First(&delete).Delete(&delete).Error; err != nil {
 		return err
 	}
 	return nil

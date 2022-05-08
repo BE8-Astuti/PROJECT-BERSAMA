@@ -9,7 +9,6 @@ import (
 	"together/be8/repository/cart"
 
 	controllerus "together/be8/delivery/controller/user"
-	"together/be8/delivery/routes"
 	userRepo "together/be8/repository/user"
 
 	"github.com/go-playground/validator"
@@ -33,8 +32,8 @@ func main() {
 
 	// Initiate Echo
 	e := echo.New()
-	// Akses Path Address
-	routes.Path(e, userRepo, AddressControl, cartControl)
+	// Akses Path Addressss
+	routes.Path(e, userControl, AddressControl, cartControl)
 	e.Logger.Fatal(e.Start(":8000"))
 
 }

@@ -3,6 +3,7 @@ package address
 import (
 	"net/http"
 	"strconv"
+	middlewares "together/be8/delivery/middleware"
 	"together/be8/delivery/view"
 	addressV "together/be8/delivery/view/address"
 	"together/be8/entities"
@@ -39,8 +40,10 @@ func (r *ControlAddress) CreateAddress() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.Validate())
 		}
+
+		id := middlewares.ExtractTokenUserId(c)
 		NewAdd := entities.Address{
-			// UserID:       1,
+			UserID:       uint(id),
 			Recipient:    Insert.Recipient,
 			HP:           Insert.HP,
 			Street:       Insert.Street,
@@ -61,7 +64,8 @@ func (r *ControlAddress) CreateAddress() echo.HandlerFunc {
 // METHOD GET ALL ADDRESS
 func (r *ControlAddress) GetAllAddress() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		result, err := r.Repo.GetAllAddress()
+		UserID := middlewares.ExtractTokenUserId(c)
+		result, err := r.Repo.GetAllAddress(uint(UserID))
 		if err != nil {
 			log.Warn(err)
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
@@ -79,7 +83,8 @@ func (r *ControlAddress) GetAddressID() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
-		result, errGetAddressID := r.Repo.GetAddressID(uint(idAddress))
+		UserID := middlewares.ExtractTokenUserId(c)
+		result, errGetAddressID := r.Repo.GetAddressID(uint(idAddress), uint(UserID))
 		if errGetAddressID != nil {
 			log.Warn(errGetAddressID)
 			return c.JSON(http.StatusNotFound, view.NotFound())
@@ -101,6 +106,8 @@ func (r *ControlAddress) UpdateAddress() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
+		UserID := middlewares.ExtractTokenUserId(c)
+
 		UpdateAddress := entities.Address{
 			Recipient:    update.Recipient,
 			HP:           update.HP,
@@ -111,7 +118,7 @@ func (r *ControlAddress) UpdateAddress() echo.HandlerFunc {
 			Zip:          update.Zip,
 		}
 
-		result, errNotFound := r.Repo.UpdateAddress(uint(idAddress), UpdateAddress)
+		result, errNotFound := r.Repo.UpdateAddress(uint(idAddress), UpdateAddress, uint(UserID))
 		if errNotFound != nil {
 			log.Warn(errNotFound)
 			return c.JSON(http.StatusNotFound, view.NotFound())
@@ -129,7 +136,9 @@ func (r *ControlAddress) DeleteAddress() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
-		errDelete := r.Repo.DeleteAddress(uint(idAddress))
+		UserID := middlewares.ExtractTokenUserId(c)
+
+		errDelete := r.Repo.DeleteAddress(uint(idAddress), uint(UserID))
 		if errDelete != nil {
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}

@@ -71,9 +71,8 @@ func TestInsertUser(t *testing.T) {
 			"name":     "yani",
 			"email":    "y",
 			"password": "849",
-
-			"phone":  "77979799",
-			"status": "basic",
+			"phone":    "77979799",
+			"status":   false,
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON) // Set Content to JSON
@@ -445,7 +444,7 @@ func (mur *mockUserRepository) InsertUser(newUser entities.User) (entities.User,
 }
 
 func (mur *mockUserRepository) GetAllUser() ([]entities.User, error) {
-	return []entities.User{{Name: "Astuti", Phone: "7897787", Email: "a@gmail.com", Status: "basic"}}, nil
+	return []entities.User{{Name: "Astuti", Phone: "7897787", Email: "a@gmail.com", Status: false}}, nil
 }
 
 func (mur *mockUserRepository) GetUserID(ID int) (entities.User, error) {
