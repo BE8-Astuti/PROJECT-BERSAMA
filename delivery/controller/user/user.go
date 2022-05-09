@@ -3,18 +3,11 @@ package user
 import (
 	"net/http"
 	"strconv"
-<<<<<<< HEAD
-	jwt "together/be8/delivery/middleware"
-=======
 	middlewares "together/be8/delivery/middleware"
->>>>>>> 1ea5cc3 (update)
 	"together/be8/delivery/view"
 	userview "together/be8/delivery/view/user"
 	"together/be8/entities"
-<<<<<<< HEAD
 	ruser "together/be8/repository/user"
-=======
->>>>>>> 1ea5cc3 (update)
 
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
@@ -33,28 +26,30 @@ func New(repo ruser.User, valid *validator.Validate) *UserController {
 	}
 }
 
-func (uc *UserController) InsertUser(c echo.Context) error {
-	var tmpUser userview.InsertUserRequest
+func (uc *UserController) InsertUser() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var tmpUser userview.InsertUserRequest
 
-	if err := c.Bind(&tmpUser); err != nil {
-		log.Warn("salah input")
-		return c.JSON(http.StatusBadRequest, userview.BadRequest())
+		if err := c.Bind(&tmpUser); err != nil {
+			log.Warn("salah input")
+			return c.JSON(http.StatusUnsupportedMediaType, view.BindData())
+		}
+
+		if err := uc.Valid.Struct(&tmpUser); err != nil {
+			log.Warn(err.Error())
+			return c.JSON(http.StatusNotAcceptable, view.Validate())
+		}
+
+		newUser := entities.User{Name: tmpUser.Name, Email: tmpUser.Email, Password: tmpUser.Password, Phone: tmpUser.Phone}
+		res, err := uc.Repo.InsertUser(newUser)
+
+		if err != nil {
+			log.Warn("masalah pada server")
+			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
+		}
+		log.Info("berhasil insert")
+		return c.JSON(http.StatusCreated, userview.SuccessInsert(res))
 	}
-
-	if err := uc.Valid.Struct(tmpUser); err != nil {
-		log.Warn(err.Error())
-		return c.JSON(http.StatusBadRequest, userview.BadRequest())
-	}
-
-	newUser := entities.User{Name: tmpUser.Name, Email: tmpUser.Email, Password: tmpUser.Password, Phone: tmpUser.Phone}
-	res, err := uc.Repo.InsertUser(newUser)
-
-	if err != nil {
-		log.Warn("masalah pada server")
-		return c.JSON(http.StatusInternalServerError, view.InternalServerError())
-	}
-	log.Info("berhasil insert")
-	return c.JSON(http.StatusCreated, userview.SuccessInsert(res))
 }
 
 // func (uc *UserController) GetAllUser(c echo.Context) error {
@@ -81,78 +76,60 @@ func (uc *UserController) GetUserbyID() echo.HandlerFunc {
 		convID, err := strconv.Atoi(id)
 		if err != nil {
 			log.Error(err)
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"code":    http.StatusInternalServerError,
-				"message": "cannot convert ID",
-				"data":    nil,
-			})
+			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
-		UserID := middlewares.ExtractTokenUserId(c)
+		// UserID := middlewares.ExtractTokenUserId(c)
+		// log.Debugf("id: %d,  user: %d ", convID, UserID)
+		// if UserID != float64(convID) {
+		// 	return c.JSON(http.StatusNotFound, view.NotFound())
+		// }
 
-		if UserID != float64(convID) {
-			return c.JSON(http.StatusNotFound, view.NotFoundError())
-		}
-
-		hasil, err := uc.Repo.GetUserID(int(UserID))
+		hasil, err := uc.Repo.GetUserID(convID)
 
 		if err != nil {
-			log.Warn(err)
-			notFound := "data tidak ditemukan"
-			if err.Error() == notFound {
-				return c.JSON(http.StatusNotFound, view.NotFoundError())
-			}
-			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
-
+			log.Warn()
+			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
 
-		log.Info("data user found")
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"code":    http.StatusOK,
-			"message": "data user ditemukan",
-			"status":  true,
-			"data":    hasil,
-		})
+		return c.JSON(http.StatusOK, userview.StatusGetIdOk(hasil))
+
 	}
 
 }
 
 func (uc *UserController) UpdateUserID() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := new(userview.UpdateUserRequest)
+		var update userview.UpdateUserRequest
 
-		if err := c.Bind(u); err != nil {
-			return err
+		if err := c.Bind(&update); err != nil {
+			return c.JSON(http.StatusUnsupportedMediaType, view.BindData())
 		}
 
-		id, errorr := strconv.Atoi(c.Param("id"))
-		if errorr != nil {
-			log.Error(errorr)
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"code":    http.StatusInternalServerError,
-				"message": "cannot convert ID",
-				"data":    nil,
-			})
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			log.Warn(err)
+			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
+		// UserID := middlewares.ExtractTokenUserId(c)
 
-		hasil, err := uc.Repo.UpdateUser(id, u.Email)
+		// if UserID != float64(id) {
+		// 	return c.JSON(http.StatusNotFound, view.NotFound())
+		// }
+		UpdateEmail := entities.User{Email: update.Email}
+
+		hasil, err := uc.Repo.UpdateUser(id, UpdateEmail.Email)
 
 		if err != nil {
 			log.Warn(err)
 			notFound := "data tidak ditemukan"
 			if err.Error() == notFound {
-				return c.JSON(http.StatusNotFound, view.NotFoundError())
+				return c.JSON(http.StatusNotFound, view.NotFound())
 			}
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 
 		}
 
-		log.Info("data user update")
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"code":    http.StatusOK,
-			"message": "data user update",
-			"status":  true,
-			"data":    hasil,
-		})
+		return c.JSON(http.StatusOK, userview.StatusUpdate(hasil))
 	}
 
 }
@@ -162,30 +139,30 @@ func (uc *UserController) Login() echo.HandlerFunc {
 
 		if err := c.Bind(&param); err != nil {
 			log.Warn("salah input")
-			return c.JSON(http.StatusBadRequest, userview.BadRequest())
+			return c.JSON(http.StatusUnsupportedMediaType, view.BindData())
 		}
 
-		if err := uc.Valid.Struct(param); err != nil {
+		if err := uc.Valid.Struct(&param); err != nil {
 			log.Warn(err.Error())
-			return c.JSON(http.StatusBadRequest, userview.BadRequest())
+			return c.JSON(http.StatusNotAcceptable, view.Validate())
 		}
 
 		hasil, err := uc.Repo.Login(param.Email, param.Password)
 
 		if err != nil {
 			log.Warn(err.Error())
-			return c.JSON(http.StatusNotFound, "Email atau Password tidak ditemukan")
+			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
 
 		res := userview.LoginResponse{}
 
 		if res.Token == "" {
-			token, _ := middlewares.CreateToken(int(hasil.ID), (hasil.Name), (hasil.Email))
+			token, _ := middlewares.CreateToken(float64(hasil.ID), (hasil.Name), (hasil.Email))
 			res.Token = token
-			return c.JSON(http.StatusOK, view.OK(res, "Berhasil login"))
+			return c.JSON(http.StatusOK, userview.LoginOK(res, "Berhasil login"))
 		}
 
-		return c.JSON(http.StatusOK, view.OK(res, "Berhasil login"))
+		return c.JSON(http.StatusOK, userview.LoginOK(res, "Berhasil login"))
 	}
 }
 
@@ -193,33 +170,25 @@ func (uc *UserController) DeleteUserID() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
 
-		convID, errorr := strconv.Atoi(id)
-
-		if errorr != nil {
-			log.Error(errorr)
-			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"code":    http.StatusInternalServerError,
-				"message": "cannot convert ID",
-				"data":    nil,
-			})
-		}
-		res, err := uc.Repo.DeleteUser(convID)
+		convID, err := strconv.Atoi(id)
 
 		if err != nil {
 			log.Warn(err)
-			notFound := "data tidak dapat didelete"
-			if err.Error() == notFound {
-				return c.JSON(http.StatusNotFound, view.NotFoundError())
-			}
-			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
-
+			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
-		log.Info("data user delete")
-		return c.JSON(http.StatusOK, map[string]interface{}{
-			"code":    http.StatusOK,
-			"message": "data user delete",
-			"status":  true,
-			"data":    res,
-		})
+
+		// UserID := middlewares.ExtractTokenUserId(c)
+
+		// if UserID != float64(convID) {
+		// 	return c.JSON(http.StatusNotFound, view.NotFound())
+		// }
+
+		_, erro := uc.Repo.DeleteUser(convID)
+
+		if erro != nil {
+			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
+		}
+
+		return c.JSON(http.StatusOK, view.StatusDelete())
 	}
 }

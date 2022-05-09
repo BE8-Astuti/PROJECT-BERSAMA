@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func CreateToken(userId int, name, email string) (string, error) {
+func CreateToken(userId float64, name, email string) (string, error) {
 	claims := jwt.MapClaims{}
 
 	claims["userId"] = userId
