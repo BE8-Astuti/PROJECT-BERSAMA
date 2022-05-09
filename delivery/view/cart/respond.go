@@ -5,6 +5,18 @@ import (
 	"together/be8/entities"
 )
 
+type CartProduct struct {
+	NameProduct string `json:"nameProduct" validate:"required"`
+	Qty         int    `json:"qty" validate:"required"`
+	Price       int    `json:"price" validate:"required"`
+	ToBuy       string `json:"toBuy" validate:"required"`
+}
+
+type GetCart struct {
+	NameSeller string        `json:"nameSeller"`
+	Product    []CartProduct `json:"product"`
+}
+
 func StatusGetAllOk(data []GetCart, BillTotal int) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,

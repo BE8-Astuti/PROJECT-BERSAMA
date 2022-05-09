@@ -12,4 +12,5 @@ type Address struct {
 	UrbanVillage string `gorm:"urbanVillage"`
 	City         string `gorm:"city"`
 	Zip          string `gorm:"zip"`
+	Default      string `gorm:"default"`
 }
