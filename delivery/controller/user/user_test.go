@@ -7,7 +7,10 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	middlewares "together/be8/delivery/middleware"
 	"together/be8/entities"
+
+	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
@@ -15,54 +18,60 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetAllUser(t *testing.T) {
-	t.Run("Success Get All", func(t *testing.T) {
-		e := echo.New()
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
-		res := httptest.NewRecorder()
-		context := e.NewContext(req, res)
-		context.SetPath("/user")
-
-		userController := New(&mockUserRepository{}, validator.New())
-		userController.GetAllUser(context)
-
-		type response struct {
-			Code    int
-			Message string
-			Status  bool
-			Data    []entities.User
-		}
-
-		var resp response
-
-		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-		assert.Equal(t, resp.Data[0].Name, "Astuti")
-	})
-	t.Run("Error Get All", func(t *testing.T) {
-		e := echo.New()
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
-		res := httptest.NewRecorder()
-		context := e.NewContext(req, res)
-		context.SetPath("/user")
-
-		userController := New(&erorrMockUserRepository{}, validator.New())
-		userController.GetAllUser(context)
-
-		type response struct {
-			Code    int
-			Message string
-			Status  bool
-			Data    []entities.User
-		}
-
-		var resp response
-
-		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-		assert.Nil(t, resp.Data)
-		assert.False(t, resp.Status)
-		assert.Equal(t, 500, resp.Code)
+func TestCreateToken(t *testing.T) {
+	t.Run("Create Token", func(t *testing.T) {
+		token, _ = middlewares.CreateToken(1, "Yani", "y@gmail.com")
 	})
 }
+
+// func TestGetAllUser(t *testing.T) {
+// 	t.Run("Success Get All", func(t *testing.T) {
+// 		e := echo.New()
+// 		req := httptest.NewRequest(http.MethodGet, "/", nil)
+// 		res := httptest.NewRecorder()
+// 		context := e.NewContext(req, res)
+// 		context.SetPath("/user")
+
+// 		userController := New(&mockUserRepository{}, validator.New())
+// 		userController.GetAllUser(context)
+
+// 		type response struct {
+// 			Code    int
+// 			Message string
+// 			Status  bool
+// 			Data    []entities.User
+// 		}
+
+// 		var resp response
+
+// 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
+// 		assert.Equal(t, resp.Data[0].Name, "Astuti")
+// 	})
+// 	t.Run("Error Get All", func(t *testing.T) {
+// 		e := echo.New()
+// 		req := httptest.NewRequest(http.MethodGet, "/", nil)
+// 		res := httptest.NewRecorder()
+// 		context := e.NewContext(req, res)
+// 		context.SetPath("/user")
+
+// 		userController := New(&erorrMockUserRepository{}, validator.New())
+// 		userController.GetAllUser(context)
+
+// 		type response struct {
+// 			Code    int
+// 			Message string
+// 			Status  bool
+// 			Data    []entities.User
+// 		}
+
+// 		var resp response
+
+// 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
+// 		assert.Nil(t, resp.Data)
+// 		assert.False(t, resp.Status)
+// 		assert.Equal(t, 500, resp.Code)
+// 	})
+// }
 
 func TestInsertUser(t *testing.T) {
 	t.Run("Success Insert", func(t *testing.T) {
@@ -76,6 +85,8 @@ func TestInsertUser(t *testing.T) {
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON) // Set Content to JSON
+		// req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
 		context.SetPath("/user")
@@ -93,9 +104,10 @@ func TestInsertUser(t *testing.T) {
 		var resp response
 
 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-		assert.Equal(t, "yani", resp.Data.(map[string]interface{})["name"])
+		assert.Equal(t, "berhasil insert data user", resp.Message)
 		assert.True(t, resp.Status)
 		assert.Equal(t, 201, resp.Code)
+		assert.NotNil(t, resp.Data)
 	})
 	t.Run("Error Validasi", func(t *testing.T) {
 		e := echo.New()
@@ -192,248 +204,375 @@ func TestGetUserbyID(t *testing.T) {
 	t.Run("Success Get User by ID", func(t *testing.T) {
 		e := echo.New()
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
 		context.SetPath("/user/:id")
 		context.SetParamNames("id")
-		context.SetParamValues("6")
-
-		userController := New(&mockUserRepository{}, validator.New())
-		userController.GetUserbyID(context)
-
-		type response struct {
+		context.SetParamValues("2")
+		GetUser := New(&mockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.GetUserbyID())(context)
+		type Response struct {
 			Code    int
 			Message string
 			Status  bool
-			Data    entities.User
+			Data    interface{}
 		}
 
-		var resp response
-		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-		assert.Equal(t, "yani", resp.Data.Name)
-		assert.True(t, resp.Status)
-		assert.Equal(t, 200, resp.Code)
+		var result Response
+
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+		assert.Equal(t, 200, result.Code)
+		assert.Equal(t, "data user ditemukan", result.Message)
+		assert.True(t, result.Status)
+		assert.NotNil(t, result.Data)
 	})
 	t.Run("Error Konversi", func(t *testing.T) {
 		e := echo.New()
+
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/user")
-
-		userController := New(&erorrMockUserRepository{}, validator.New())
-		userController.GetUserbyID(context)
-
-		type response struct {
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("C")
+		GetUser := New(&erorrMockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.GetUserbyID())(context)
+		type Response struct {
 			Code    int
 			Message string
 			Status  bool
-			Data    entities.User
 		}
 
-		var resp response
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
 
-		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-		assert.Nil(t, resp.Data)
-		assert.False(t, resp.Status)
-		assert.Equal(t, 500, resp.Code)
+		assert.Equal(t, 500, result.Code)
+		assert.Equal(t, "cannot convert ID", result.Message)
+		assert.False(t, result.Status)
 	})
 	t.Run("Error Get DB", func(t *testing.T) {
 		e := echo.New()
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/user")
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("2")
 
 		userController := New(&erorrMockUserRepository{}, validator.New())
-		userController.GetUserbyID(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(userController.GetUserbyID())(context)
 
-		type response struct {
+		type Response struct {
 			Code    int
 			Message string
 			Status  bool
-			Data    entities.User
+			Data    interface{}
 		}
 
-		var resp response
+		var result Response
 
-		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-		assert.Nil(t, resp.Data)
-		assert.False(t, resp.Status)
-		assert.Equal(t, 500, resp.Code)
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+		assert.Equal(t, 500, result.Code)
+		assert.NotEqual(t, "data tidak ditemukan", result.Message)
+		assert.False(t, result.Status)
+
 	})
-	t.Run("Error Get data", func(t *testing.T) {
+
+}
+
+func TestUpdateUserID(t *testing.T) {
+	t.Run("Success Get All", func(t *testing.T) {
 		e := echo.New()
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		requestBody, _ := json.Marshal(map[string]interface{}{
+			"email": "y@gmail.com",
+		})
+		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/user")
-
-		userController := New(&erorrMockUserRepository{}, validator.New())
-		userController.GetUserbyID(context)
-
-		type response struct {
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("3")
+		UserCont := New(&mockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(UserCont.UpdateUserID())(context)
+		type Response struct {
 			Code    int
 			Message string
 			Status  bool
-			Data    entities.User
+			Data    interface{}
 		}
 
-		var resp response
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
 
-		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-		assert.Nil(t, resp.Data)
-		assert.False(t, resp.Status)
-		assert.Equal(t, 404, resp.Code)
+		assert.Equal(t, 200, result.Code)
+		assert.Equal(t, "data user update", result.Message)
+		assert.True(t, result.Status)
+		assert.NotNil(t, result.Data)
+	})
+	t.Run("Error Konversi", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("C")
+		GetUser := New(&erorrMockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.UpdateUserID())(context)
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 500, result.Code)
+		assert.Equal(t, "cannot convert ID", result.Message)
+		assert.False(t, result.Status)
+	})
+	t.Run("Error Not Found", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/address/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("7")
+		GetUser := New(&erorrMockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.UpdateUserID())(context)
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.NotEqual(t, 404, result.Code)
+		assert.NotEqual(t, "data tidak ditemukan", result.Message)
+		assert.False(t, result.Status)
+	})
+
+}
+
+func TestDeleteUserID(t *testing.T) {
+
+	t.Run("Success Delete Address", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("5")
+		GetUser := New(&mockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.DeleteUserID())(context)
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 200, result.Code)
+		assert.Equal(t, "data user delete", result.Message)
+		assert.True(t, result.Status)
+	})
+	t.Run("Error Konversi", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("C")
+		GetUser := New(&erorrMockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.DeleteUserID())(context)
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 500, result.Code)
+		assert.Equal(t, "cannot convert ID", result.Message)
+		assert.False(t, result.Status)
+	})
+	t.Run("Error Not Found", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("7")
+		GetUser := New(&erorrMockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.DeleteUserID())(context)
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 500, result.Code)
+		assert.NotEqual(t, "data tidak dapat didelete", result.Message)
+		assert.False(t, result.Status)
 	})
 }
 
-// func TestUpdateUserID(t *testing.T) {
-// 	t.Run("Success Get All", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodGet, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users")
+var token string
 
-// 		userController := New(&mockUserRepository{}, validator.New())
-// 		userController(context)
+func TestLogin(t *testing.T) {
+	t.Run("Success Login", func(t *testing.T) {
+		e := echo.New()
+		requestBody, _ := json.Marshal(map[string]interface{}{
+			"email":    "y@gmail.com",
+			"password": "yani",
+		})
+		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/login")
 
-// 		type response struct {
-// 			Code    int
-// 			Message string
-// 			Status  bool
-// 			Data    []entity.Pegawai
-// 		}
+		controller := New(&mockUserRepository{}, validator.New())
+		controller.Login()(context)
 
-// 		var resp response
+		type ResponseStructure struct {
+			Code    int
+			Message string
+			Status  bool
+			Data    interface{}
+		}
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-// 		assert.Equal(t, resp.Data[0].Nama, "Jerry")
-// 	})
-// 	t.Run("Error Get All", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodGet, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users")
+		var response ResponseStructure
 
-// 		pegawaiController := New(&erorrMockUserRepository{}, validator.New())
-// 		pegawaiController.GetAllPegawai(context)
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		assert.Equal(t, 200, response.Code)
+		assert.True(t, response.Status)
+		assert.NotNil(t, response.Data)
+		data := response.Data.(map[string]interface{})
+		token = data["Token"].(string)
+	})
+	t.Run("Error Validasi", func(t *testing.T) {
+		e := echo.New()
+		requestBody, _ := json.Marshal(map[string]interface{}{
+			"password": "779",
+		})
 
-// 		type response struct {
-// 			Code    int
-// 			Message string
-// 			Status  bool
-// 			Data    []entity.Pegawai
-// 		}
+		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/login")
 
-// 		var resp response
+		userController := New(&erorrMockUserRepository{}, validator.New())
+		userController.Login()(context)
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-// 		assert.Nil(t, resp.Data)
-// 		assert.False(t, resp.Status)
-// 		assert.Equal(t, 500, resp.Code)
-// 	})
-// }
+		type response struct {
+			Code    int
+			Message string
+			Status  bool
+			Data    interface{}
+		}
 
-// func TestDeleteUserID(t *testing.T) {
-// 	t.Run("Success Get All", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodGet, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users")
+		var resp response
 
-// 		pegawaiController := New(&mockUserRepository{}, validator.New())
-// 		pegawaiController.GetAllPegawai(context)
+		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
+		log.Warn(resp)
+		assert.False(t, resp.Status)
+		assert.Nil(t, resp.Data)
+		assert.Equal(t, 400, resp.Code)
+	})
+	t.Run("Error Bind", func(t *testing.T) {
+		e := echo.New()
+		requestBody, _ := json.Marshal(map[string]interface{}{
+			"password": "779",
+		})
 
-// 		type response struct {
-// 			Code    int
-// 			Message string
-// 			Status  bool
-// 			Data    []entity.Pegawai
-// 		}
+		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/login")
 
-// 		var resp response
+		userController := New(&erorrMockUserRepository{}, validator.New())
+		userController.Login()(context)
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-// 		assert.Equal(t, resp.Data[0].Nama, "Jerry")
-// 	})
-// 	t.Run("Error Get All", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodGet, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users")
+		type response struct {
+			Code    int
+			Message string
+			Status  bool
+			Data    interface{}
+		}
 
-// 		pegawaiController := New(&erorrMockUserRepository{}, validator.New())
-// 		pegawaiController.GetAllPegawai(context)
+		var resp response
 
-// 		type response struct {
-// 			Code    int
-// 			Message string
-// 			Status  bool
-// 			Data    []entity.Pegawai
-// 		}
+		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
+		log.Warn(resp)
+		assert.False(t, resp.Status)
+		assert.Nil(t, resp.Data)
+		assert.Equal(t, 400, resp.Code)
+	})
+	t.Run("Error Get DB", func(t *testing.T) {
+		e := echo.New()
 
-// 		var resp response
+		req := httptest.NewRequest(http.MethodPost, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-// 		assert.Nil(t, resp.Data)
-// 		assert.False(t, resp.Status)
-// 		assert.Equal(t, 500, resp.Code)
-// 	})
-// }
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/login")
+		GetAddress := New(&erorrMockUserRepository{}, validator.New())
+		GetAddress.Login()(context)
 
-// func TestLogin(t *testing.T) {
-// 	t.Run("Success Get All", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodGet, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users")
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
 
-// 		pegawaiController := New(&mockUserRepository{}, validator.New())
-// 		pegawaiController.GetAllPegawai(context)
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
 
-// 		type response struct {
-// 			Code    int
-// 			Message string
-// 			Status  bool
-// 			Data    []entity.Pegawai
-// 		}
-
-// 		var resp response
-
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-// 		assert.Equal(t, resp.Data[0].Nama, "Jerry")
-// 	})
-// 	t.Run("Error Get All", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodGet, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/users")
-
-// 		pegawaiController := New(&erorrMockUserRepository{}, validator.New())
-// 		pegawaiController.GetAllPegawai(context)
-
-// 		type response struct {
-// 			Code    int
-// 			Message string
-// 			Status  bool
-// 			Data    []entity.Pegawai
-// 		}
-
-// 		var resp response
-
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-// 		assert.Nil(t, resp.Data)
-// 		assert.False(t, resp.Status)
-// 		assert.Equal(t, 500, resp.Code)
-// 	})
-// }
+		assert.Equal(t, 400, result.Code)
+		assert.Equal(t, "terdapat kesalahan pada input data user", result.Message)
+		assert.False(t, result.Status)
+	})
+}
 
 // Dummy Data
 
