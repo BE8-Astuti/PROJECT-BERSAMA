@@ -516,6 +516,94 @@ func TestDeleteAddress(t *testing.T) {
 	})
 }
 
+// TEST SETDEFAULT ADDRESS BY ID
+func TestSetDefaultAddress(t *testing.T) {
+	t.Run("Success Set Default Address", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/address/:id/default")
+		context.SetParamNames("id")
+		context.SetParamValues("7")
+		GetAddress := NewControlAddress(&mockAddress{}, validator.New())
+
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.SetDefaultAddress())(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 200, result.Code)
+		assert.Equal(t, "Update Default Address Success", result.Message)
+		assert.True(t, result.Status)
+	})
+	t.Run("Error Set Default Address", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/address/:id/default")
+		context.SetParamNames("id")
+		context.SetParamValues("7")
+		GetAddress := NewControlAddress(&errMockAddress{}, validator.New())
+
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.SetDefaultAddress())(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 500, result.Code)
+		assert.Equal(t, "Cannot Access Database", result.Message)
+		assert.False(t, result.Status)
+	})
+	t.Run("Error Convert ID", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/address/:id/default")
+		context.SetParamNames("id")
+		context.SetParamValues("C")
+		GetAddress := NewControlAddress(&errMockAddress{}, validator.New())
+
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.SetDefaultAddress())(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 406, result.Code)
+		assert.Equal(t, "Cannot Convert ID", result.Message)
+		assert.False(t, result.Status)
+	})
+}
+
 // MOCK SUCCESS
 type mockAddress struct {
 }

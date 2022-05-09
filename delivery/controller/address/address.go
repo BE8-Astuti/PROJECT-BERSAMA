@@ -161,6 +161,6 @@ func (r *ControlAddress) SetDefaultAddress() echo.HandlerFunc {
 		if errDefault != nil {
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}
-		return c.JSON(http.StatusOK, view.StatusDelete())
+		return c.JSON(http.StatusOK, addressV.StatusDefaultAddress())
 	}
 }
