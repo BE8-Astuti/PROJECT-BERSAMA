@@ -10,7 +10,7 @@ type User struct {
 	Email    string    `json:"email" gorm:"unique"`
 	Password string    `json:"password" form:"password"`
 	Phone    string    `json:"phone" gorm:"unique"`
-	Status   bool      `json:"status"`
+	Status   string    `json:"status"`
 	Address  []Address `gorm:"foreignKey:UserID;references:id"`
 	Product  []Product `gorm:"foreignKey:UserID;references:id"`
 	Cart     []Cart    `gorm:"foreignKey:UserID;references:id"`
