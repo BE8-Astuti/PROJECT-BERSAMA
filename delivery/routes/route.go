@@ -21,7 +21,7 @@ func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.
 	// ROUTES USER
 	user := e.Group("/user")
 	user.POST("", u.InsertUser) // Register
-	user.GET("", u.GetAllUser, middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	// user.GET("", u.GetAllUser, middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	user.GET("/:id", u.GetUserbyID, middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	user.PUT("/:id", u.UpdateUserID, middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	user.DELETE("/:id", u.DeleteUserID, middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
