@@ -33,6 +33,7 @@ func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.
 	Address.GET("/:id", a.GetAddressID(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	Address.PUT("/:id", a.UpdateAddress(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	Address.DELETE("/:id", a.DeleteAddress(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	Address.PUT("/:id/default", a.SetDefaultAddress(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 
 	// Routes Cart
 	Cart := e.Group("/cart")

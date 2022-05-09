@@ -8,4 +8,5 @@ type AddressControl interface {
 	GetAddressID() echo.HandlerFunc
 	UpdateAddress() echo.HandlerFunc
 	DeleteAddress() echo.HandlerFunc
+	SetDefaultAddress() echo.HandlerFunc
 }

@@ -40,3 +40,11 @@ func StatusUpdate(data entities.Address) map[string]interface{} {
 		"data":    data,
 	}
 }
+
+func StatusDefaultAddress() map[string]interface{} {
+	return map[string]interface{}{
+		"code":    http.StatusOK,
+		"message": "Update Default Address Success",
+		"status":  true,
+	}
+}

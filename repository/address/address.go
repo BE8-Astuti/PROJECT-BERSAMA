@@ -70,3 +70,16 @@ func (a *AddressDB) DeleteAddress(id uint, UserID uint) error {
 	}
 	return nil
 }
+
+func (a *AddressDB) SetDefaultAddress(id uint, UserID uint) error {
+	if err := a.Db.Table("addresses").Where("user_id = ?", UserID).Update("address_default", "no").Error; err != nil {
+		return err
+	}
+
+	var address entities.Address
+
+	if err := a.Db.Table("addresses").Where("id = ? AND user_id = ?", id, UserID).First(&address).Update("address_default", "yes").Error; err != nil {
+		return err
+	}
+	return nil
+}
