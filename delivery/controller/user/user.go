@@ -3,18 +3,12 @@ package user
 import (
 	"net/http"
 	"strconv"
-<<<<<<< HEAD
-	jwt "together/be8/delivery/middleware"
-=======
 	middlewares "together/be8/delivery/middleware"
->>>>>>> 1ea5cc3 (update)
 	"together/be8/delivery/view"
+	"together/be8/delivery/view/user"
 	userview "together/be8/delivery/view/user"
 	"together/be8/entities"
-<<<<<<< HEAD
 	ruser "together/be8/repository/user"
-=======
->>>>>>> 1ea5cc3 (update)
 
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
@@ -33,28 +27,30 @@ func New(repo ruser.User, valid *validator.Validate) *UserController {
 	}
 }
 
-func (uc *UserController) InsertUser(c echo.Context) error {
-	var tmpUser userview.InsertUserRequest
+func (uc *UserController) InsertUser() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var tmpUser userview.InsertUserRequest
 
-	if err := c.Bind(&tmpUser); err != nil {
-		log.Warn("salah input")
-		return c.JSON(http.StatusBadRequest, userview.BadRequest())
+		if err := c.Bind(&tmpUser); err != nil {
+			log.Warn("salah input")
+			return c.JSON(http.StatusBadRequest, userview.BadRequest())
+		}
+
+		if err := uc.Valid.Struct(tmpUser); err != nil {
+			log.Warn(err.Error())
+			return c.JSON(http.StatusBadRequest, userview.BadRequest())
+		}
+
+		newUser := entities.User{Name: tmpUser.Name, Email: tmpUser.Email, Password: tmpUser.Password, Phone: tmpUser.Phone}
+		res, err := uc.Repo.InsertUser(newUser)
+
+		if err != nil {
+			log.Warn("masalah pada server")
+			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
+		}
+		log.Info("berhasil insert")
+		return c.JSON(http.StatusCreated, userview.SuccessInsert(res))
 	}
-
-	if err := uc.Valid.Struct(tmpUser); err != nil {
-		log.Warn(err.Error())
-		return c.JSON(http.StatusBadRequest, userview.BadRequest())
-	}
-
-	newUser := entities.User{Name: tmpUser.Name, Email: tmpUser.Email, Password: tmpUser.Password, Phone: tmpUser.Phone}
-	res, err := uc.Repo.InsertUser(newUser)
-
-	if err != nil {
-		log.Warn("masalah pada server")
-		return c.JSON(http.StatusInternalServerError, view.InternalServerError())
-	}
-	log.Info("berhasil insert")
-	return c.JSON(http.StatusCreated, userview.SuccessInsert(res))
 }
 
 // func (uc *UserController) GetAllUser(c echo.Context) error {
@@ -90,7 +86,7 @@ func (uc *UserController) GetUserbyID() echo.HandlerFunc {
 		UserID := middlewares.ExtractTokenUserId(c)
 
 		if UserID != float64(convID) {
-			return c.JSON(http.StatusNotFound, view.NotFoundError())
+			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
 
 		hasil, err := uc.Repo.GetUserID(int(UserID))
@@ -99,7 +95,7 @@ func (uc *UserController) GetUserbyID() echo.HandlerFunc {
 			log.Warn(err)
 			notFound := "data tidak ditemukan"
 			if err.Error() == notFound {
-				return c.JSON(http.StatusNotFound, view.NotFoundError())
+				return c.JSON(http.StatusNotFound, view.NotFound())
 			}
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 
@@ -133,14 +129,19 @@ func (uc *UserController) UpdateUserID() echo.HandlerFunc {
 				"data":    nil,
 			})
 		}
+		UserID := middlewares.ExtractTokenUserId(c)
 
-		hasil, err := uc.Repo.UpdateUser(id, u.Email)
+		if UserID != float64(id) {
+			return c.JSON(http.StatusNotFound, view.NotFound())
+		}
+
+		hasil, err := uc.Repo.UpdateUser(int(UserID), u.Email)
 
 		if err != nil {
 			log.Warn(err)
 			notFound := "data tidak ditemukan"
 			if err.Error() == notFound {
-				return c.JSON(http.StatusNotFound, view.NotFoundError())
+				return c.JSON(http.StatusNotFound, view.NotFound())
 			}
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 
@@ -182,10 +183,10 @@ func (uc *UserController) Login() echo.HandlerFunc {
 		if res.Token == "" {
 			token, _ := middlewares.CreateToken(int(hasil.ID), (hasil.Name), (hasil.Email))
 			res.Token = token
-			return c.JSON(http.StatusOK, view.OK(res, "Berhasil login"))
+			return c.JSON(http.StatusOK, user.LoginOK(res, "Berhasil login"))
 		}
 
-		return c.JSON(http.StatusOK, view.OK(res, "Berhasil login"))
+		return c.JSON(http.StatusOK, user.LoginOK(res, "Berhasil login"))
 	}
 }
 
@@ -203,13 +204,20 @@ func (uc *UserController) DeleteUserID() echo.HandlerFunc {
 				"data":    nil,
 			})
 		}
-		res, err := uc.Repo.DeleteUser(convID)
+
+		UserID := middlewares.ExtractTokenUserId(c)
+
+		if UserID != float64(convID) {
+			return c.JSON(http.StatusNotFound, view.NotFound())
+		}
+
+		res, err := uc.Repo.DeleteUser(int(UserID))
 
 		if err != nil {
 			log.Warn(err)
 			notFound := "data tidak dapat didelete"
 			if err.Error() == notFound {
-				return c.JSON(http.StatusNotFound, view.NotFoundError())
+				return c.JSON(http.StatusNotFound, view.NotFound())
 			}
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 
