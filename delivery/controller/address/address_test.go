@@ -538,6 +538,10 @@ func (m *mockAddress) DeleteAddress(id uint, UserID uint) error {
 	return nil
 }
 
+func (m *mockAddress) SetDefaultAddress(id uint, UserID uint) error {
+	return nil
+}
+
 // MOCK ERROR
 type errMockAddress struct {
 }
@@ -560,5 +564,9 @@ func (e *errMockAddress) UpdateAddress(id uint, updatedAddress entities.Address,
 }
 
 func (e *errMockAddress) DeleteAddress(id uint, UserID uint) error {
+	return errors.New("Access Database Error")
+}
+
+func (e *errMockAddress) SetDefaultAddress(id uint, UserID uint) error {
 	return errors.New("Access Database Error")
 }

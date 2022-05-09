@@ -145,3 +145,22 @@ func (r *ControlAddress) DeleteAddress() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, view.StatusDelete())
 	}
 }
+
+// SET DEFAULT ADDRESS
+func (r *ControlAddress) SetDefaultAddress() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		id := c.Param("id")
+		idAddress, err := strconv.Atoi(id)
+		if err != nil {
+			log.Warn(err)
+			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
+		}
+		UserID := middlewares.ExtractTokenUserId(c)
+
+		errDefault := r.Repo.SetDefaultAddress(uint(idAddress), uint(UserID))
+		if errDefault != nil {
+			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
+		}
+		return c.JSON(http.StatusOK, view.StatusDelete())
+	}
+}
