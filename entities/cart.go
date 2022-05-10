@@ -11,4 +11,5 @@ type Cart struct {
 	ToBuy       string `json:"toBuy"`
 	UserID      uint
 	ProductID   uint
+	OrderID     uint
 }

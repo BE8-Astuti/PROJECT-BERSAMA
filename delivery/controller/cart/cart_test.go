@@ -532,6 +532,10 @@ func (m *mockCart) DeleteCart(id uint, UserID uint) error {
 	return nil
 }
 
+func (m *mockCart) Shipment(UserID uint) (entities.Address, []entities.Cart, []string, error) {
+	return entities.Address{}, []entities.Cart{}, []string{}, nil
+}
+
 // MOCK ERROR
 type errMockCart struct {
 }
@@ -555,4 +559,8 @@ func (e *errMockCart) UpdateCart(id uint, updatedCart entities.Cart, UserID uint
 
 func (e *errMockCart) DeleteCart(id uint, UserID uint) error {
 	return errors.New("Access Database Error")
+}
+
+func (e *errMockCart) Shipment(UserID uint) (entities.Address, []entities.Cart, []string, error) {
+	return entities.Address{}, []entities.Cart{}, []string{}, errors.New("Access Database Error")
 }

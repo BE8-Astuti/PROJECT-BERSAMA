@@ -79,6 +79,7 @@ func (uc *UserController) GetUserbyID() echo.HandlerFunc {
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
 		// UserID := middlewares.ExtractTokenUserId(c)
+		// UserID := middlewares.ExtractTokenUserId(c)
 		// log.Debugf("id: %d,  user: %d ", convID, UserID)
 		// if UserID != float64(convID) {
 		// 	return c.JSON(http.StatusNotFound, view.NotFound())
