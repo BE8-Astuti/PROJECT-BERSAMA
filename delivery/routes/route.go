@@ -3,6 +3,7 @@ package routes
 import (
 	"together/be8/delivery/controller/address"
 	"together/be8/delivery/controller/cart"
+	"together/be8/delivery/controller/transaction"
 	"together/be8/delivery/controller/user"
 
 	// cbook "together/be8/delivery/controller/book"
@@ -11,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.CartControl) {
+func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.CartControl, t transaction.TransController) {
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
@@ -39,9 +40,15 @@ func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.
 	Cart := e.Group("/cart")
 	Cart.POST("", c.CreateCart(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	Cart.GET("", c.GetAllCart(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
-	Cart.GET("/:id", c.GetCartID(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	Cart.PUT("/:id", c.UpdateCart(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	Cart.DELETE("/:id", c.DeleteCart(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	Cart.GET("/shipment", c.Shipment(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 
+	// ROUTES TRANSACTION
+	Transaction := e.Group("/transaction")
+	Transaction.POST("", t.CreateTransaction(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	Transaction.GET("", t.GetAllTransaction(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	Transaction.GET("/:order_id", t.GetTransactionDetail(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	Transaction.POST("/:order_id/pay", t.PayTransaction(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	Transaction.POST("/:order_id/cancel", t.CancelTransaction(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 }

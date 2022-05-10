@@ -50,7 +50,6 @@ func (r *ControlCart) CreateCart() echo.HandlerFunc {
 			NameProduct: Insert.NameProduct,
 			Qty:         Insert.Qty,
 			Price:       Insert.Price,
-			ToBuy:       Insert.ToBuy,
 		}
 		result, errCreate := r.Repo.CreateCart(NewAdd)
 		if errCreate != nil {
@@ -99,25 +98,6 @@ func (r *ControlCart) GetAllCart() echo.HandlerFunc {
 			res = append(res, data)
 		}
 		return c.JSON(http.StatusOK, cartV.StatusGetAllOk(res, totalbill))
-	}
-}
-
-// METHOD GET CART BY ID
-func (r *ControlCart) GetCartID() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		id := c.Param("id")
-		idcart, err := strconv.Atoi(id)
-		if err != nil {
-			log.Warn(err)
-			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
-		}
-		UserID := middlewares.ExtractTokenUserId(c)
-		result, errGetcartID := r.Repo.GetCartID(uint(idcart), uint(UserID))
-		if errGetcartID != nil {
-			log.Warn(errGetcartID)
-			return c.JSON(http.StatusNotFound, view.NotFound())
-		}
-		return c.JSON(http.StatusOK, cartV.StatusGetIdOk(result))
 	}
 }
 
@@ -172,7 +152,7 @@ func (r *ControlCart) Shipment() echo.HandlerFunc {
 		address, Cart, seller, err := r.Repo.Shipment(uint(UserID))
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, view.InternalServerError())
+			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}
 		var data cartV.GetCart
 		var res []cartV.GetCart
@@ -193,7 +173,6 @@ func (r *ControlCart) Shipment() echo.HandlerFunc {
 						cek[v.ID]++
 					}
 				}
-				fmt.Println(NameSeller, v.ID)
 			}
 			totalbill += subTotal
 			data.Product = addProduct
