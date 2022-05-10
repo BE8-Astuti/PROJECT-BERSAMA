@@ -20,7 +20,11 @@ func NewDB(db *gorm.DB) *AddressDB {
 }
 
 // CREATE NEW ADDRESS TO DATABASE
-func (a *AddressDB) CreateAddress(newAdd entities.Address) (entities.Address, error) {
+func (a *AddressDB) CreateAddress(newAdd entities.Address, UserID uint) (entities.Address, error) {
+	CheckAddress, _ := a.GetAllAddress(UserID)
+	if len(CheckAddress) == 0 {
+		newAdd.AddressDefault = "yes"
+	}
 	if err := a.Db.Create(&newAdd).Error; err != nil {
 		log.Warn(err)
 		return newAdd, err
@@ -66,6 +70,19 @@ func (a *AddressDB) DeleteAddress(id uint, UserID uint) error {
 
 	var delete entities.Address
 	if err := a.Db.Where("id = ? AND user_id = ?", id, UserID).First(&delete).Delete(&delete).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AddressDB) SetDefaultAddress(id uint, UserID uint) error {
+	if err := a.Db.Table("addresses").Where("user_id = ?", UserID).Update("address_default", "no").Error; err != nil {
+		return err
+	}
+
+	var address entities.Address
+
+	if err := a.Db.Table("addresses").Where("id = ? AND user_id = ?", id, UserID).First(&address).Update("address_default", "yes").Error; err != nil {
 		return err
 	}
 	return nil

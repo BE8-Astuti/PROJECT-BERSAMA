@@ -15,6 +15,16 @@ type CartProduct struct {
 type GetCart struct {
 	NameSeller string        `json:"nameSeller"`
 	Product    []CartProduct `json:"product"`
+<<<<<<< HEAD
+=======
+	SubTotal   int           `json:"subTotal"`
+}
+
+type Shipment struct {
+	Address   entities.Address `json:"address"`
+	Product   []GetCart
+	BillTotal int `json:"billTotal"`
+>>>>>>> 5f55a00de6bfc19de872f87a859e885974fa0e23
 }
 
 func StatusGetAllOk(data []GetCart, BillTotal int) map[string]interface{} {
@@ -46,6 +56,15 @@ func StatusCreate(data entities.Cart) map[string]interface{} {
 }
 
 func StatusUpdate(data entities.Cart) map[string]interface{} {
+	return map[string]interface{}{
+		"code":    http.StatusOK,
+		"message": "Updated",
+		"status":  true,
+		"data":    data,
+	}
+}
+
+func ShipmentOk(data Shipment) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
 		"message": "Updated",

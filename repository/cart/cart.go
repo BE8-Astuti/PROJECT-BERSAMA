@@ -2,7 +2,6 @@ package cart
 
 import (
 	"errors"
-	"fmt"
 	"together/be8/entities"
 
 	"github.com/labstack/gommon/log"
@@ -33,7 +32,6 @@ func (r *RepoCart) GetAllCart(UserID uint) ([]entities.Cart, []string, error) {
 	var AllCart []entities.Cart
 
 	test := []string{}
-	fmt.Println(UserID)
 	if err := r.Db.Table("carts").Where("user_id = ?", UserID).Select("name_seller").Distinct("name_seller").Order("created_at DESC").Find(&test).Error; err != nil {
 		log.Warn("Error Get All Cart", err)
 		return AllCart, test, errors.New("Access Database Error")
@@ -74,7 +72,26 @@ func (r *RepoCart) DeleteCart(id uint, UserID uint) error {
 
 	var delete entities.Cart
 	if err := r.Db.Where("id = ? AND user_id = ?", id, UserID).First(&delete).Delete(&delete).Error; err != nil {
+		log.Warn("Delete Cart Error")
 		return err
 	}
 	return nil
+}
+
+// GET DATA SHIPMENT
+func (r *RepoCart) Shipment(UserID uint) (entities.Address, []entities.Cart, []string, error) {
+	var Address entities.Address
+	var Cart []entities.Cart
+	Seller := []string{}
+	if err := r.Db.Where("user_id=? AND address_default='yes'", UserID).First(&Address).Error; err != nil {
+		return Address, Cart, Seller, err
+	}
+	if err := r.Db.Where("user_id=? AND to_buy='yes'", UserID).Find(&Cart).Error; err != nil {
+		return Address, Cart, Seller, err
+	}
+	if err := r.Db.Table("carts").Where("user_id = ? AND to_buy='yes'", UserID).Select("name_seller").Distinct("name_seller").Order("created_at DESC").Find(&Seller).Error; err != nil {
+		log.Warn("Error Get All Cart", err)
+		return Address, Cart, Seller, err
+	}
+	return Address, Cart, Seller, nil
 }

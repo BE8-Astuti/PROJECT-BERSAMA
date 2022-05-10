@@ -8,4 +8,5 @@ type CartControl interface {
 	GetCartID() echo.HandlerFunc
 	UpdateCart() echo.HandlerFunc
 	DeleteCart() echo.HandlerFunc
+	Shipment() echo.HandlerFunc
 }

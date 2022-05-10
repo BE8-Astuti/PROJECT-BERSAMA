@@ -35,3 +35,20 @@ func LoginOK(data LoginResponse, message string) map[string]interface{} {
 		"data":    data,
 	}
 }
+
+func StatusUpdate(data entities.User) map[string]interface{} {
+	return map[string]interface{}{
+		"code":    http.StatusOK,
+		"message": "Updated",
+		"status":  true,
+		"data":    data,
+	}
+}
+func StatusGetIdOk(data interface{}) map[string]interface{} {
+	return map[string]interface{}{
+		"code":    http.StatusOK,
+		"message": "Success Get Data ID",
+		"status":  true,
+		"data":    data,
+	}
+}

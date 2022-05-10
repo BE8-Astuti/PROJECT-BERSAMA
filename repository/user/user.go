@@ -40,22 +40,22 @@ func (ur *UserRepo) InsertUser(newUser entities.User) (entities.User, error) {
 	return newUser, nil
 }
 
-func (ur *UserRepo) GetAllUser() ([]entities.User, error) {
-	arrUser := []entities.User{}
+// func (ur *UserRepo) GetAllUser() ([]entities.User, error) {
+// 	arrUser := []entities.User{}
 
-	if err := ur.Db.Find(&arrUser).Error; err != nil {
-		log.Warn(err)
-		return nil, errors.New("tidak bisa select data")
-	}
+// 	if err := ur.Db.Find(&arrUser).Error; err != nil {
+// 		log.Warn(err)
+// 		return nil, errors.New("tidak bisa select data")
+// 	}
 
-	if len(arrUser) == 0 {
-		log.Warn("tidak ada data")
-		return nil, errors.New("tidak ada data")
-	}
+// 	if len(arrUser) == 0 {
+// 		log.Warn("tidak ada data")
+// 		return nil, errors.New("tidak ada data")
+// 	}
 
-	log.Info()
-	return arrUser, nil
-}
+// 	log.Info()
+// 	return arrUser, nil
+// }
 
 func (ur *UserRepo) GetUserID(ID int) (entities.User, error) {
 	arrUser := []entities.User{}
