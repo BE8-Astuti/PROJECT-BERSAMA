@@ -20,58 +20,9 @@ import (
 
 func TestCreateToken(t *testing.T) {
 	t.Run("Create Token", func(t *testing.T) {
-		token, _ = middlewares.CreateToken(2, "Yani", "y@gmail.com")
+		token, _ = middlewares.CreateToken(3, "Yani", "y@gmail.com")
 	})
 }
-
-// func TestGetAllUser(t *testing.T) {
-// 	t.Run("Success Get All", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodGet, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/user")
-
-// 		userController := New(&mockUserRepository{}, validator.New())
-// 		userController.GetAllUser(context)
-
-// 		type response struct {
-// 			Code    int
-// 			Message string
-// 			Status  bool
-// 			Data    []entities.User
-// 		}
-
-// 		var resp response
-
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-// 		assert.Equal(t, resp.Data[0].Name, "Astuti")
-// 	})
-// 	t.Run("Error Get All", func(t *testing.T) {
-// 		e := echo.New()
-// 		req := httptest.NewRequest(http.MethodGet, "/", nil)
-// 		res := httptest.NewRecorder()
-// 		context := e.NewContext(req, res)
-// 		context.SetPath("/user")
-
-// 		userController := New(&erorrMockUserRepository{}, validator.New())
-// 		userController.GetAllUser(context)
-
-// 		type response struct {
-// 			Code    int
-// 			Message string
-// 			Status  bool
-// 			Data    []entities.User
-// 		}
-
-// 		var resp response
-
-// 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-// 		assert.Nil(t, resp.Data)
-// 		assert.False(t, resp.Status)
-// 		assert.Equal(t, 500, resp.Code)
-// 	})
-// }
 
 func TestInsertUser(t *testing.T) {
 	t.Run("Success Insert", func(t *testing.T) {
@@ -171,8 +122,11 @@ func TestInsertUser(t *testing.T) {
 	t.Run("Error Insert DB", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
-			"name":  "yani",
-			"phone": "779",
+			"name":     "yani",
+			"email":    "y@gmail.com",
+			"password": "849",
+			"phone":    "77979799",
+			"status":   "starseller",
 		})
 
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
@@ -196,7 +150,7 @@ func TestInsertUser(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
 		assert.False(t, resp.Status)
 		assert.Nil(t, resp.Data)
-		assert.Equal(t, 406, resp.Code)
+		assert.Equal(t, 500, resp.Code)
 	})
 }
 
@@ -210,7 +164,7 @@ func TestGetUserbyID(t *testing.T) {
 		context := e.NewContext(req, res)
 		context.SetPath("/user/:id")
 		context.SetParamNames("id")
-		context.SetParamValues("2")
+		context.SetParamValues("3")
 		GetUser := New(&mockUserRepository{}, validator.New())
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.GetUserbyID())(context)
 		type Response struct {
@@ -255,6 +209,34 @@ func TestGetUserbyID(t *testing.T) {
 		assert.False(t, result.Status)
 	})
 	t.Run("Error Get DB", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("3")
+
+		userController := New(&erorrMockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(userController.GetUserbyID())(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+			Data    interface{}
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 404, result.Code)
+		assert.Equal(t, "Data Not Found", result.Message)
+		assert.False(t, result.Status)
+	})
+	t.Run("Error Not Found", func(t *testing.T) {
 		e := echo.New()
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -318,9 +300,7 @@ func TestUpdateUserID(t *testing.T) {
 	})
 	t.Run("Error Bind", func(t *testing.T) {
 		e := echo.New()
-		requestBody, _ := json.Marshal(map[string]interface{}{
-			"phone": "779",
-		})
+		requestBody := "Error Bind"
 
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -347,7 +327,7 @@ func TestUpdateUserID(t *testing.T) {
 		log.Warn(resp)
 		assert.False(t, resp.Status)
 		assert.Nil(t, resp.Data)
-		assert.Equal(t, 500, resp.Code)
+		assert.Equal(t, 415, resp.Code)
 	})
 	t.Run("Error Konversi", func(t *testing.T) {
 		e := echo.New()
@@ -385,7 +365,7 @@ func TestUpdateUserID(t *testing.T) {
 		context := e.NewContext(req, res)
 		context.SetPath("/address/:id")
 		context.SetParamNames("id")
-		context.SetParamValues("7")
+		context.SetParamValues("3")
 		GetUser := New(&erorrMockUserRepository{}, validator.New())
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.UpdateUserID())(context)
 		type Response struct {
@@ -401,7 +381,34 @@ func TestUpdateUserID(t *testing.T) {
 		assert.Equal(t, "Cannot Access Database", result.Message)
 		assert.False(t, result.Status)
 	})
+	t.Run("Error Not Found Access Token", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("2")
 
+		userController := New(&erorrMockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(userController.UpdateUserID())(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+			Data    interface{}
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 404, result.Code)
+		assert.Equal(t, "Data Not Found", result.Message)
+		assert.False(t, result.Status)
+	})
 }
 
 func TestDeleteUserID(t *testing.T) {
@@ -416,7 +423,7 @@ func TestDeleteUserID(t *testing.T) {
 		context := e.NewContext(req, res)
 		context.SetPath("/user/:id")
 		context.SetParamNames("id")
-		context.SetParamValues("5")
+		context.SetParamValues("3")
 		GetUser := New(&mockUserRepository{}, validator.New())
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.DeleteUserID())(context)
 		type Response struct {
@@ -468,7 +475,7 @@ func TestDeleteUserID(t *testing.T) {
 		context := e.NewContext(req, res)
 		context.SetPath("/user/:id")
 		context.SetParamNames("id")
-		context.SetParamValues("7")
+		context.SetParamValues("3")
 		GetUser := New(&erorrMockUserRepository{}, validator.New())
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.DeleteUserID())(context)
 		type Response struct {
@@ -482,6 +489,32 @@ func TestDeleteUserID(t *testing.T) {
 
 		assert.Equal(t, 500, result.Code)
 		assert.NotEqual(t, "data tidak dapat didelete", result.Message)
+		assert.False(t, result.Status)
+	})
+	t.Run("Error Not Found Access Token", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("6")
+		GetUser := New(&erorrMockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.DeleteUserID())(context)
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 404, result.Code)
+		assert.Equal(t, "Data Not Found", result.Message)
 		assert.False(t, result.Status)
 	})
 }
@@ -579,7 +612,34 @@ func TestLogin(t *testing.T) {
 		assert.Nil(t, resp.Data)
 		assert.Equal(t, 415, resp.Code)
 	})
+	t.Run("Error Login", func(t *testing.T) {
+		e := echo.New()
+		requestBody, _ := json.Marshal(map[string]interface{}{
+			"email":    "y@gmail.com",
+			"password": "yani",
+		})
+		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/login")
 
+		controller := New(&erorrMockUserRepository{}, validator.New())
+		controller.Login()(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 404, result.Code)
+		assert.Equal(t, "Data Not Found", result.Message)
+		assert.False(t, result.Status)
+	})
 }
 
 // Dummy Data

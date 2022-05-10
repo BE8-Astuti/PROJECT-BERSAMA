@@ -64,7 +64,7 @@ func StatusUpdate(data entities.Cart) map[string]interface{} {
 func ShipmentOk(data Shipment) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
-		"message": "Updated",
+		"message": "Success Get Data Shipment",
 		"status":  true,
 		"data":    data,
 	}

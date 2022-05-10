@@ -8,6 +8,6 @@ type Transaction struct {
 	Address       string `json:"address"`
 	PaymentMethod string `json:"paymentMethod"`
 	TotalBill     int    `json:"totalBill"`
-	Status        string `json:"status"`
-	Cart          []Cart `gorm:"foreignKey:OrderID;references:id"`
+	Status        string `json:"status" gorm:"default:pending"`
+	OrderID       string `json:"orderID"`
 }

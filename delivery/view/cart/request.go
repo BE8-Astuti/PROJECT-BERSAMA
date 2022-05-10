@@ -5,11 +5,8 @@ type InsertCart struct {
 	NameProduct string `json:"nameProduct" validate:"required"`
 	Qty         int    `json:"qty" validate:"required"`
 	Price       int    `json:"price" validate:"required"`
-	ToBuy       string `json:"toBuy" validate:"required"`
 	ProductID   uint   `json:"productId" validate:"required"`
 }
-
-
 
 type UpdateCart struct {
 	Qty   int    `json:"qty"`
