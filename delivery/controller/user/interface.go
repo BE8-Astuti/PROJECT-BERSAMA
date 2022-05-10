@@ -5,10 +5,9 @@ import (
 )
 
 type ControllerUser interface {
-	InsertUser(c echo.Context) error
-	// GetAllUser(c echo.Context) error
-	GetUserbyID(c echo.Context) error
-	UpdateUserID(c echo.Context) error
-	DeleteUserID(c echo.Context) error
-	Login(c echo.Context) error
+	InsertUser(c echo.Context) error // GetAllUser() echo.HandlerFunc
+	GetUserbyID() echo.HandlerFunc
+	UpdateUserID() echo.HandlerFunc
+	DeleteUserID() echo.HandlerFunc
+	Login() echo.HandlerFunc
 }

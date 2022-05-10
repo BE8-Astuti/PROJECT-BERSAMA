@@ -3,18 +3,11 @@ package user
 import (
 	"net/http"
 	"strconv"
-<<<<<<< HEAD
-	jwt "together/be8/delivery/middleware"
-=======
 	middlewares "together/be8/delivery/middleware"
->>>>>>> 1ea5cc3 (update)
 	"together/be8/delivery/view"
 	userview "together/be8/delivery/view/user"
 	"together/be8/entities"
-<<<<<<< HEAD
 	ruser "together/be8/repository/user"
-=======
->>>>>>> 1ea5cc3 (update)
 
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
@@ -90,7 +83,7 @@ func (uc *UserController) GetUserbyID() echo.HandlerFunc {
 		UserID := middlewares.ExtractTokenUserId(c)
 
 		if UserID != float64(convID) {
-			return c.JSON(http.StatusNotFound, view.NotFoundError())
+			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
 
 		hasil, err := uc.Repo.GetUserID(int(UserID))
@@ -99,7 +92,7 @@ func (uc *UserController) GetUserbyID() echo.HandlerFunc {
 			log.Warn(err)
 			notFound := "data tidak ditemukan"
 			if err.Error() == notFound {
-				return c.JSON(http.StatusNotFound, view.NotFoundError())
+				return c.JSON(http.StatusNotFound, view.NotFound())
 			}
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 
@@ -140,7 +133,7 @@ func (uc *UserController) UpdateUserID() echo.HandlerFunc {
 			log.Warn(err)
 			notFound := "data tidak ditemukan"
 			if err.Error() == notFound {
-				return c.JSON(http.StatusNotFound, view.NotFoundError())
+				return c.JSON(http.StatusNotFound, view.NotFound())
 			}
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 
@@ -182,10 +175,10 @@ func (uc *UserController) Login() echo.HandlerFunc {
 		if res.Token == "" {
 			token, _ := middlewares.CreateToken(int(hasil.ID), (hasil.Name), (hasil.Email))
 			res.Token = token
-			return c.JSON(http.StatusOK, view.OK(res, "Berhasil login"))
+			return c.JSON(http.StatusOK, userview.LoginOK(res, "Berhasil login"))
 		}
 
-		return c.JSON(http.StatusOK, view.OK(res, "Berhasil login"))
+		return c.JSON(http.StatusOK, userview.LoginOK(res, "Berhasil login"))
 	}
 }
 
@@ -209,7 +202,7 @@ func (uc *UserController) DeleteUserID() echo.HandlerFunc {
 			log.Warn(err)
 			notFound := "data tidak dapat didelete"
 			if err.Error() == notFound {
-				return c.JSON(http.StatusNotFound, view.NotFoundError())
+				return c.JSON(http.StatusNotFound, view.NotFound())
 			}
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 

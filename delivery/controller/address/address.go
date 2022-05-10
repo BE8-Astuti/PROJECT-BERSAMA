@@ -52,7 +52,7 @@ func (r *ControlAddress) CreateAddress() echo.HandlerFunc {
 			City:         Insert.City,
 			Zip:          Insert.Zip,
 		}
-		result, errCreate := r.Repo.CreateAddress(NewAdd)
+		result, errCreate := r.Repo.CreateAddress(NewAdd, uint(id))
 		if errCreate != nil {
 			log.Warn(errCreate)
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())

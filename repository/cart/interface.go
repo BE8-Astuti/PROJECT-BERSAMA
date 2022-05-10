@@ -10,4 +10,5 @@ type CartRepository interface {
 	GetCartID(id uint, UserID uint) (entities.Cart, error)
 	UpdateCart(id uint, updatedCart entities.Cart, UserID uint) (entities.Cart, error)
 	DeleteCart(id uint, UserID uint) error
+	Shipment(UserID uint) (entities.Address, []entities.Cart, []string, error)
 }
