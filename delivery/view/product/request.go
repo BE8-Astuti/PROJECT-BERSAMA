@@ -1,12 +1,11 @@
 package product
 
 type InsertProdukRequest struct {
-	UserID      uint   `json:"user_id" validate:"required"`
-	CategoryID  int    `json:"category_id"`
+	CategoryID  int    `json:"category_id" validate:"required"`
 	Name        string `json:"name" validate:"required"`
-	Stock       int    `json:"stock"`
-	Price       int    `json:"price"`
-	Description string `json:"description"`
+	Stock       int    `json:"stock" validate:"required"`
+	Price       int    `json:"price" validate:"required"`
+	Description string `json:"description" validate:"required"`
 }
 
 type UpdateProdukRequest struct {

@@ -25,7 +25,7 @@ func TestCreateToken(t *testing.T) {
 	})
 }
 
-// TEST METHODE CREATE_ADDRESS
+// TEST METHODE CREATE_CART
 func TestCreateCart(t *testing.T) {
 	t.Run("Create Success", func(t *testing.T) {
 		e := echo.New()
@@ -155,7 +155,7 @@ func TestCreateCart(t *testing.T) {
 	})
 }
 
-// TEST GET ALL ADDRESS
+// TEST GET ALL CART
 func TestGetAllCart(t *testing.T) {
 	t.Run("Success Get All Cart", func(t *testing.T) {
 		e := echo.New()
@@ -213,96 +213,7 @@ func TestGetAllCart(t *testing.T) {
 	})
 }
 
-// TEST GET ADDRESS BY ID
-func TestGetCartID(t *testing.T) {
-	t.Run("Success Get Cart By ID", func(t *testing.T) {
-		e := echo.New()
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
-		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
-		res := httptest.NewRecorder()
-		context := e.NewContext(req, res)
-		context.SetPath("/cart/:id")
-		context.SetParamNames("id")
-		context.SetParamValues("1")
-		GetCart := NewControlCart(&mockCart{}, validator.New())
-
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.GetCartID())(context)
-
-		type Response struct {
-			Code    int
-			Message string
-			Status  bool
-			Data    interface{}
-		}
-
-		var result Response
-
-		json.Unmarshal([]byte(res.Body.Bytes()), &result)
-		assert.Equal(t, 200, result.Code)
-		assert.Equal(t, "Success Get Data ID", result.Message)
-		assert.True(t, result.Status)
-		assert.NotNil(t, result.Data)
-	})
-	t.Run("Error Not Found", func(t *testing.T) {
-		e := echo.New()
-
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
-		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
-		res := httptest.NewRecorder()
-		context := e.NewContext(req, res)
-		context.SetPath("/cart/:id")
-		context.SetParamNames("id")
-		context.SetParamValues("1")
-		GetCart := NewControlCart(&errMockCart{}, validator.New())
-
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.GetCartID())(context)
-
-		type Response struct {
-			Code    int
-			Message string
-			Status  bool
-		}
-
-		var result Response
-		json.Unmarshal([]byte(res.Body.Bytes()), &result)
-
-		assert.Equal(t, 404, result.Code)
-		assert.Equal(t, "Data Not Found", result.Message)
-		assert.False(t, result.Status)
-	})
-	t.Run("Error Convert ID", func(t *testing.T) {
-		e := echo.New()
-
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
-		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
-		res := httptest.NewRecorder()
-		context := e.NewContext(req, res)
-		context.SetPath("/cart/:id")
-		context.SetParamNames("id")
-		context.SetParamValues("C")
-		GetCart := NewControlCart(&errMockCart{}, validator.New())
-
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.GetCartID())(context)
-
-		type Response struct {
-			Code    int
-			Message string
-			Status  bool
-		}
-
-		var result Response
-		json.Unmarshal([]byte(res.Body.Bytes()), &result)
-
-		assert.Equal(t, 406, result.Code)
-		assert.Equal(t, "Cannot Convert ID", result.Message)
-		assert.False(t, result.Status)
-	})
-}
-
-// TEST UPDATE ADDRESS BY ID
+// TEST UPDATE CART BY ID
 func TestUpdateCart(t *testing.T) {
 	t.Run("Update Success", func(t *testing.T) {
 		e := echo.New()
@@ -422,7 +333,7 @@ func TestUpdateCart(t *testing.T) {
 	})
 }
 
-// TEST DELETE ADDRESS BY ID
+// TEST DELETE CART BY ID
 func TestDeleteCart(t *testing.T) {
 	t.Run("Success Delete Cart", func(t *testing.T) {
 		e := echo.New()
@@ -510,6 +421,66 @@ func TestDeleteCart(t *testing.T) {
 	})
 }
 
+// TEST GET SHIPMENT DETAIL
+func TestShipment(t *testing.T) {
+	t.Run("Success Get Shipment", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/shipment")
+
+		GetCart := NewControlCart(&mockCart{}, validator.New())
+
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.Shipment())(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+			Data    interface{}
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 200, result.Code)
+		assert.Equal(t, "Success Get Data Shipment", result.Message)
+		assert.True(t, result.Status)
+		assert.NotNil(t, result.Data)
+	})
+	t.Run("Error Get Shipment", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/shipment")
+
+		GetCart := NewControlCart(&errMockCart{}, validator.New())
+
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCart.Shipment())(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 500, result.Code)
+		assert.Equal(t, "Cannot Access Database", result.Message)
+		assert.False(t, result.Status)
+	})
+}
+
 // MOCK SUCCESS
 type mockCart struct {
 }
@@ -530,6 +501,10 @@ func (m *mockCart) UpdateCart(id uint, updatedCart entities.Cart, UserID uint) (
 
 func (m *mockCart) DeleteCart(id uint, UserID uint) error {
 	return nil
+}
+
+func (m *mockCart) Shipment(UserID uint) (entities.Address, []entities.Cart, []string, error) {
+	return entities.Address{Recipient: "Galih", HP: "123456"}, []entities.Cart{{NameProduct: "Motor", NameSeller: "Otomotif Center", Qty: 2, Price: 50000, ToBuy: "yes"}}, []string{"Otomotif Center"}, nil
 }
 
 // MOCK ERROR
@@ -555,4 +530,8 @@ func (e *errMockCart) UpdateCart(id uint, updatedCart entities.Cart, UserID uint
 
 func (e *errMockCart) DeleteCart(id uint, UserID uint) error {
 	return errors.New("Access Database Error")
+}
+
+func (e *errMockCart) Shipment(UserID uint) (entities.Address, []entities.Cart, []string, error) {
+	return entities.Address{}, []entities.Cart{}, []string{}, errors.New("Access Database Error")
 }

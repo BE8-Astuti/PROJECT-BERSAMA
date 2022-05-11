@@ -47,27 +47,13 @@ func (uc *UserController) InsertUser() echo.HandlerFunc {
 			log.Warn("masalah pada server")
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}
+
+		response := userview.RespondUser{Name: res.Name, Username: res.Username, Email: res.Email, Phone: res.Phone, UserID: res.ID}
+
 		log.Info("berhasil insert")
-		return c.JSON(http.StatusCreated, userview.SuccessInsert(res))
+		return c.JSON(http.StatusCreated, userview.SuccessInsert(response))
 	}
 }
-
-// func (uc *UserController) GetAllUser(c echo.Context) error {
-
-// 	res, err := uc.Repo.GetAllUser()
-
-// 	if err != nil {
-// 		log.Warn("masalah pada server")
-// 		return c.JSON(http.StatusInternalServerError, view.InternalServerError())
-// 	}
-// 	log.Info("berhasil get all data")
-// 	return c.JSON(http.StatusOK, map[string]interface{}{
-// 		"code":    http.StatusOK,
-// 		"message": "berhasil get all data",
-// 		"status":  true,
-// 		"data":    res,
-// 	})
-// }
 
 func (uc *UserController) GetUserbyID() echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -78,21 +64,20 @@ func (uc *UserController) GetUserbyID() echo.HandlerFunc {
 			log.Error(err)
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
-		// UserID := middlewares.ExtractTokenUserId(c)
-		// log.Debugf("id: %d,  user: %d ", convID, UserID)
-		// if UserID != float64(convID) {
-		// 	return c.JSON(http.StatusNotFound, view.NotFound())
-		// }
+		UserID := middlewares.ExtractTokenUserId(c)
+		if UserID != float64(convID) {
+			return c.JSON(http.StatusNotFound, view.NotFound())
+		}
 
-		hasil, err := uc.Repo.GetUserID(convID)
+		res, err := uc.Repo.GetUserID(convID)
 
 		if err != nil {
 			log.Warn()
 			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
+		response := userview.RespondUser{Name: res.Name, Username: res.Username, Email: res.Email, Phone: res.Phone, UserID: res.ID}
 
-		return c.JSON(http.StatusOK, userview.StatusGetIdOk(hasil))
-
+		return c.JSON(http.StatusOK, userview.StatusGetIdOk(response))
 	}
 
 }
@@ -110,14 +95,14 @@ func (uc *UserController) UpdateUserID() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
-		// UserID := middlewares.ExtractTokenUserId(c)
+		UserID := middlewares.ExtractTokenUserId(c)
 
-		// if UserID != float64(id) {
-		// 	return c.JSON(http.StatusNotFound, view.NotFound())
-		// }
-		UpdateEmail := entities.User{Email: update.Email}
+		if UserID != float64(id) {
+			return c.JSON(http.StatusNotFound, view.NotFound())
+		}
+		UpdateUser := entities.User{Email: update.Email, Name: update.Name, Password: update.Password, Phone: update.Phone}
 
-		hasil, err := uc.Repo.UpdateUser(id, UpdateEmail.Email)
+		res, err := uc.Repo.UpdateUser(id, UpdateUser.Email)
 
 		if err != nil {
 			log.Warn(err)
@@ -128,8 +113,9 @@ func (uc *UserController) UpdateUserID() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 
 		}
+		response := userview.RespondUser{Name: res.Name, Username: res.Username, Email: res.Email, Phone: res.Phone, UserID: res.ID}
 
-		return c.JSON(http.StatusOK, userview.StatusUpdate(hasil))
+		return c.JSON(http.StatusOK, userview.StatusUpdate(response))
 	}
 
 }
@@ -177,11 +163,11 @@ func (uc *UserController) DeleteUserID() echo.HandlerFunc {
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}
 
-		// UserID := middlewares.ExtractTokenUserId(c)
+		UserID := middlewares.ExtractTokenUserId(c)
 
-		// if UserID != float64(convID) {
-		// 	return c.JSON(http.StatusNotFound, view.NotFound())
-		// }
+		if UserID != float64(convID) {
+			return c.JSON(http.StatusNotFound, view.NotFound())
+		}
 
 		_, erro := uc.Repo.DeleteUser(convID)
 

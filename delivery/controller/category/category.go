@@ -1,7 +1,6 @@
 package category
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	middlewares "together/be8/delivery/middleware"
@@ -115,7 +114,6 @@ func (r *ControlCategory) UpdateCat() echo.HandlerFunc {
 func (r *ControlCategory) DeleteCat() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
-		fmt.Printf("status: %s", id)
 		catid, err := strconv.Atoi(id)
 
 		if err != nil {

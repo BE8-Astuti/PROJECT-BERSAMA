@@ -8,7 +8,9 @@ type Cart struct {
 	NameProduct string `json:"nameProduct"`
 	Qty         int    `json:"qty"`
 	Price       int    `json:"price"`
-	ToBuy       string `json:"toBuy"`
+	ToBuy       string `json:"toBuy" gorm:"default:yes"`
+	OrderID     string `json:"orderID"`
+	UrlProduct  string `json:"urlProduct"`
 	UserID      uint
 	ProductID   uint
 }

@@ -2,10 +2,22 @@ package product
 
 import (
 	"net/http"
-	"together/be8/entities"
 )
 
-func StatusGetAllOk(data []entities.Product) map[string]interface{} {
+type RespondProduct struct {
+	ProductID   uint   `json:"productId"`
+	UserID      uint   `json:"userId"`
+	CategoryID  uint   `json:"categoryId"`
+	Name        string `json:"name"`
+	NameSeller  string `json:"nameSeller"`
+	Stock       int    `json:"stock"`
+	Price       int    `json:"price"`
+	Description string `json:"description"`
+	Sold        int    `json:"sold" gorm:"default:0"`
+	UrlProduct  string `json:"urlProduct"`
+}
+
+func StatusGetAllOk(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
 		"message": "Success Get All data",
@@ -23,7 +35,7 @@ func StatusGetIdOk(data interface{}) map[string]interface{} {
 	}
 }
 
-func StatusCreate(data entities.Product) map[string]interface{} {
+func StatusCreate(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusCreated,
 		"message": "Success Create Product",
@@ -32,7 +44,7 @@ func StatusCreate(data entities.Product) map[string]interface{} {
 	}
 }
 
-func StatusUpdate(data entities.Product) map[string]interface{} {
+func StatusUpdate(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
 		"message": "Updated",

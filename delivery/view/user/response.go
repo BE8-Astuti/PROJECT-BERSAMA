@@ -2,14 +2,21 @@ package user
 
 import (
 	"net/http"
-	"together/be8/entities"
 )
 
 type LoginResponse struct {
 	Token string
 }
 
-func SuccessInsert(data entities.User) map[string]interface{} {
+type RespondUser struct {
+	UserID   uint   `json:"userId"`
+	Username string `json:"username"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+}
+
+func SuccessInsert(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusCreated,
 		"message": "berhasil insert data user",
@@ -36,7 +43,7 @@ func LoginOK(data LoginResponse, message string) map[string]interface{} {
 	}
 }
 
-func StatusUpdate(data entities.User) map[string]interface{} {
+func StatusUpdate(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
 		"message": "Updated",

@@ -46,7 +46,7 @@ func (pc *ProdukController) InsertProd() echo.HandlerFunc {
 		id := middlewares.ExtractTokenUserId(c)
 		newProd := entities.Product{
 			UserID:      uint(id),
-			CategoryID:  tmpProd.CategoryID,
+			CategoryID:  uint(tmpProd.CategoryID),
 			Name:        tmpProd.Name,
 			Stock:       tmpProd.Stock,
 			Price:       tmpProd.Price,
@@ -58,8 +58,19 @@ func (pc *ProdukController) InsertProd() echo.HandlerFunc {
 			log.Warn(errInsert)
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}
+
+		response := vproduk.RespondProduct{
+			ProductID:   res.ID,
+			UserID:      res.UserID,
+			CategoryID:  res.CategoryID,
+			Name:        res.Name,
+			NameSeller:  res.NameSeller,
+			Stock:       res.Stock,
+			Price:       res.Price,
+			Description: res.Description,
+		}
 		log.Info("berhasil insert")
-		return c.JSON(http.StatusCreated, vproduk.StatusCreate(res))
+		return c.JSON(http.StatusCreated, vproduk.StatusCreate(response))
 	}
 }
 
@@ -77,10 +88,25 @@ func (pc *ProdukController) GetProdukbySeller() echo.HandlerFunc {
 			log.Warn(errprodukID)
 			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
-		return c.JSON(http.StatusOK, vproduk.StatusGetIdOk(result))
+		var GetAll []vproduk.RespondProduct
+		for _, v := range result {
+			response := vproduk.RespondProduct{
+				ProductID:   v.ID,
+				UserID:      v.UserID,
+				CategoryID:  v.CategoryID,
+				Name:        v.Name,
+				NameSeller:  v.NameSeller,
+				Stock:       v.Stock,
+				Price:       v.Price,
+				Description: v.Description,
+				Sold:        v.Sold,
+			}
+			GetAll = append(GetAll, response)
+		}
+		return c.JSON(http.StatusOK, vproduk.StatusGetIdOk(GetAll))
 	}
-}
 
+}
 func (pc *ProdukController) GetProdukByCategory() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
@@ -95,7 +121,22 @@ func (pc *ProdukController) GetProdukByCategory() echo.HandlerFunc {
 			log.Warn(errprodukcate)
 			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
-		return c.JSON(http.StatusOK, vproduk.StatusGetAllOk(result))
+		var GetAll []vproduk.RespondProduct
+		for _, v := range result {
+			response := vproduk.RespondProduct{
+				ProductID:   v.ID,
+				UserID:      v.UserID,
+				CategoryID:  v.CategoryID,
+				Name:        v.Name,
+				NameSeller:  v.NameSeller,
+				Stock:       v.Stock,
+				Price:       v.Price,
+				Description: v.Description,
+				Sold:        v.Sold,
+			}
+			GetAll = append(GetAll, response)
+		}
+		return c.JSON(http.StatusOK, vproduk.StatusGetAllOk(GetAll))
 	}
 }
 func (pc *ProdukController) GetProID() echo.HandlerFunc {
@@ -112,7 +153,18 @@ func (pc *ProdukController) GetProID() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
-		return c.JSON(http.StatusOK, vproduk.StatusGetIdOk(result))
+		response := vproduk.RespondProduct{
+			ProductID:   result.ID,
+			UserID:      result.UserID,
+			CategoryID:  result.CategoryID,
+			Name:        result.Name,
+			NameSeller:  result.NameSeller,
+			Stock:       result.Stock,
+			Price:       result.Price,
+			Description: result.Description,
+			Sold:        result.Sold,
+		}
+		return c.JSON(http.StatusOK, vproduk.StatusGetIdOk(response))
 	}
 }
 
@@ -132,7 +184,6 @@ func (pc *ProdukController) UpdateProduk() echo.HandlerFunc {
 		UserID := middlewares.ExtractTokenUserId(c)
 
 		UpdateProduk := entities.Product{
-
 			Name:        update.Name,
 			Stock:       update.Stock,
 			Price:       update.Price,
@@ -144,7 +195,18 @@ func (pc *ProdukController) UpdateProduk() echo.HandlerFunc {
 			log.Warn(errNotFound)
 			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
-		return c.JSON(http.StatusOK, vproduk.StatusUpdate(result))
+		response := vproduk.RespondProduct{
+			ProductID:   result.ID,
+			UserID:      result.UserID,
+			CategoryID:  result.CategoryID,
+			Name:        result.Name,
+			NameSeller:  result.NameSeller,
+			Stock:       result.Stock,
+			Price:       result.Price,
+			Description: result.Description,
+			Sold:        result.Sold,
+		}
+		return c.JSON(http.StatusOK, vproduk.StatusUpdate(response))
 	}
 }
 func (pc *ProdukController) DeleteProduk() echo.HandlerFunc {
@@ -154,7 +216,6 @@ func (pc *ProdukController) DeleteProduk() echo.HandlerFunc {
 		idproduk, err := strconv.Atoi(id)
 
 		if err != nil {
-
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.ConvertID())
 		}

@@ -11,13 +11,15 @@ import (
 
 func InitDB() *gorm.DB {
 	config := InitConfig()
-	conString := fmt.Sprintf("%s:@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
-		config.User,
-		config.Host,
-		config.DBPort,
-		config.DBName,
-	)
 
+	conString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
+		config.Username,
+		config.Password,
+		config.Address,
+		config.DB_Port,
+		config.Name,
+	)
+	// conString := "root@tcp(localhost:3306)/shopping?charset=utf8mb4&parseTime=True"
 	db, err := gorm.Open(mysql.Open(conString), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err.Error())
@@ -26,5 +28,5 @@ func InitDB() *gorm.DB {
 }
 func Migrate() {
 	db := InitDB()
-	db.AutoMigrate(&entities.User{}, &entities.Address{}, &entities.Cart{}, &entities.Category{}, entities.Product{})
+	db.AutoMigrate(&entities.User{}, &entities.Address{}, &entities.Cart{}, &entities.Category{}, entities.Product{}, entities.Transaction{})
 }
