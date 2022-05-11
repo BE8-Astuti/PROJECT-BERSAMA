@@ -1,7 +1,7 @@
 package product
 
 type InsertProdukRequest struct {
-	UserID      uint   `json:"userid" validate:"required"`
+	UserID      uint   `json:"user_id" validate:"required"`
 	CategoryID  int    `json:"category_id"`
 	Name        string `json:"name" validate:"required"`
 	Stock       int    `json:"stock"`

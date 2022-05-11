@@ -1,14 +1,12 @@
 package product
 
 import (
-	"fmt"
 	"strconv"
 	middlewares "together/be8/delivery/middleware"
 	"together/be8/delivery/view"
 
 	vproduk "together/be8/delivery/view/product"
 
-	"together/be8/repository/category"
 	"together/be8/repository/product"
 
 	"net/http"
@@ -20,15 +18,15 @@ import (
 )
 
 type ProdukController struct {
-	Repo  product.ProdukRepo
-	Crepo category.CategoryDB
+	Repo product.RepoProduk
+
 	Valid *validator.Validate
 }
 
-func New(repo product.ProdukRepo, valid *validator.Validate) *ProdukController {
+func New(NewAddp product.RepoProduk, validate *validator.Validate) *ProdukController {
 	return &ProdukController{
-		Repo:  repo,
-		Valid: valid,
+		Repo:  NewAddp,
+		Valid: validate,
 	}
 }
 
@@ -38,12 +36,12 @@ func (pc *ProdukController) InsertProd() echo.HandlerFunc {
 
 		if err := c.Bind(&tmpProd); err != nil {
 			log.Warn("salah input")
-			return c.JSON(http.StatusBadRequest, "fail")
+			return c.JSON(http.StatusUnsupportedMediaType, view.BindData())
 		}
 
 		if err := pc.Valid.Struct(&tmpProd); err != nil {
 			log.Warn(err.Error())
-			return c.JSON(http.StatusBadRequest, "fail")
+			return c.JSON(http.StatusNotAcceptable, view.Validate())
 		}
 		id := middlewares.ExtractTokenUserId(c)
 		newProd := entities.Product{
@@ -58,7 +56,7 @@ func (pc *ProdukController) InsertProd() echo.HandlerFunc {
 
 		if errInsert != nil {
 			log.Warn(errInsert)
-			return c.JSON(http.StatusInternalServerError, "fail")
+			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}
 		log.Info("berhasil insert")
 		return c.JSON(http.StatusCreated, vproduk.StatusCreate(res))
@@ -93,7 +91,7 @@ func (pc *ProdukController) GetProdukByCategory() echo.HandlerFunc {
 		}
 
 		result, errprodukcate := pc.Repo.GetProdByCategory(categoryid)
-		if errprodukcate != nil {
+		if errprodukcate != nil && len(result) == 0 {
 			log.Warn(errprodukcate)
 			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
@@ -141,7 +139,7 @@ func (pc *ProdukController) UpdateProduk() echo.HandlerFunc {
 			Description: update.Description,
 		}
 
-		result, errNotFound := pc.Repo.UpdateProduk(uint(idproduk), UpdateProduk, uint(UserID))
+		result, errNotFound := pc.Repo.UpdateProduk(idproduk, UpdateProduk, uint(UserID))
 		if errNotFound != nil {
 			log.Warn(errNotFound)
 			return c.JSON(http.StatusNotFound, view.NotFound())
@@ -152,7 +150,7 @@ func (pc *ProdukController) UpdateProduk() echo.HandlerFunc {
 func (pc *ProdukController) DeleteProduk() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
-		fmt.Printf("status: %s", id)
+
 		idproduk, err := strconv.Atoi(id)
 
 		if err != nil {

@@ -1,4 +1,4 @@
-package category
+package product
 
 import (
 	"encoding/json"
@@ -21,16 +21,20 @@ var token string
 // INITIATE TOKEN
 func TestCreateToken(t *testing.T) {
 	t.Run("Create Token", func(t *testing.T) {
-		token, _ = middlewares.CreateToken(1, "Galih", "Galih@gmail.com")
+		token, _ = middlewares.CreateToken(1, "yani", "yani@gmail.com")
 	})
 }
 
-func TestCreateCategory(t *testing.T) {
+func TestInsertProd(t *testing.T) {
 	t.Run("Create Success", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
-			"user_id": 1,
-			"name":    "kecantikan",
+			"user_id":     1,
+			"category_id": 1,
+			"name":        "tango",
+			"stock":       10,
+			"price":       10000,
+			"description": "wafer coklat",
 		})
 
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
@@ -39,10 +43,10 @@ func TestCreateCategory(t *testing.T) {
 
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category")
-		categoryC := NewControlCategory(&mockCategory{}, validator.New())
+		context.SetPath("/product")
+		Product := New(&mockProduct{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(categoryC.CreateCategory())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(Product.InsertProd())(context)
 
 		type Response struct {
 			Code    int
@@ -55,25 +59,29 @@ func TestCreateCategory(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &result)
 
 		assert.Equal(t, 201, result.Code)
-		assert.Equal(t, "Success Create Categori", result.Message)
+		assert.Equal(t, "Success Create Product", result.Message)
 		assert.True(t, result.Status)
 		assert.NotNil(t, result.Data)
 	})
 	t.Run("Error Access Database", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
-			"user_id": 1,
-			"name":    "kecantikan",
+			"user_id":     1,
+			"category_id": 1,
+			"name":        "tango",
+			"stock":       10,
+			"price":       10000,
+			"description": "wafer coklat",
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category")
-		categoryC := NewControlCategory(&errMockCategory{}, validator.New())
+		context.SetPath("/product")
+		Prod := New(&errMockProduct{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(categoryC.CreateCategory())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(Prod.InsertProd())(context)
 
 		type Response struct {
 			Code    int
@@ -98,10 +106,10 @@ func TestCreateCategory(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category")
-		categoryC := NewControlCategory(&errMockCategory{}, validator.New())
+		context.SetPath("/product")
+		Prod := New(&errMockProduct{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(categoryC.CreateCategory())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(Prod.InsertProd())(context)
 
 		type Response struct {
 			Code    int
@@ -118,7 +126,12 @@ func TestCreateCategory(t *testing.T) {
 	t.Run("Error Validate", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
-			"nama": "kecantikan",
+
+			"category_id": 1,
+			"name":        "tango",
+			"stock":       10,
+			"price":       10000,
+			"description": "wafer coklat",
 		})
 
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
@@ -126,10 +139,10 @@ func TestCreateCategory(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category")
-		categoryC := NewControlCategory(&errMockCategory{}, validator.New())
+		context.SetPath("/product")
+		Prod := New(&errMockProduct{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(categoryC.CreateCategory())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(Prod.InsertProd())(context)
 
 		type Response struct {
 			Code    int
@@ -146,19 +159,20 @@ func TestCreateCategory(t *testing.T) {
 	})
 }
 
-func TestGetAllCategory(t *testing.T) {
-	t.Run("Success Get All Category", func(t *testing.T) {
+func TestGetProdbyID(t *testing.T) {
+	t.Run("Success Get Produk By ID", func(t *testing.T) {
 		e := echo.New()
-
-		req := httptest.NewRequest(http.MethodPost, "/", nil)
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category")
-		Getcategory := NewControlCategory(&mockCategory{}, validator.New())
+		context.SetPath("/product/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("1")
+		Produk := New(&mockProduct{}, validator.New())
 
-		Getcategory.GetAllCategory()(context)
+		Produk.GetProID()(context)
 
 		type Response struct {
 			Code    int
@@ -168,25 +182,27 @@ func TestGetAllCategory(t *testing.T) {
 		}
 
 		var result Response
-		json.Unmarshal([]byte(res.Body.Bytes()), &result)
 
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
 		assert.Equal(t, 200, result.Code)
-		assert.Equal(t, "Success Get All data", result.Message)
+		assert.Equal(t, "Success Get Data", result.Message)
 		assert.True(t, result.Status)
 		assert.NotNil(t, result.Data)
 	})
-	t.Run("Error Access Database", func(t *testing.T) {
+	t.Run("Error Not Found", func(t *testing.T) {
 		e := echo.New()
 
-		req := httptest.NewRequest(http.MethodPost, "/", nil)
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category")
-		Getcategory := NewControlCategory(&errMockCategory{}, validator.New())
+		context.SetPath("/product/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("1")
+		Produk := New(&errMockProduct{}, validator.New())
 
-		Getcategory.GetAllCategory()(context)
+		Produk.GetProID()(context)
 
 		type Response struct {
 			Code    int
@@ -201,22 +217,50 @@ func TestGetAllCategory(t *testing.T) {
 		assert.Equal(t, "Data Not Found", result.Message)
 		assert.False(t, result.Status)
 	})
+	t.Run("Error Convert ID", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/product/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("C")
+		produk := New(&errMockProduct{}, validator.New())
+
+		produk.GetProID()(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 406, result.Code)
+		assert.Equal(t, "Cannot Convert ID", result.Message)
+		assert.False(t, result.Status)
+	})
 }
 
-func TestGetCategoryID(t *testing.T) {
-	t.Run("Success Get Category By ID", func(t *testing.T) {
+func TestGetProdukbySeller(t *testing.T) {
+	t.Run("Success Get Produk By Seller", func(t *testing.T) {
 		e := echo.New()
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category/:id")
+		context.SetPath("/user/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("1")
-		GetAddress := NewControlCategory(&mockCategory{}, validator.New())
+		Produk := New(&mockProduct{}, validator.New())
 
-		GetAddress.GetCategoryID()(context)
+		Produk.GetProdukbySeller()(context)
 
 		type Response struct {
 			Code    int
@@ -229,7 +273,7 @@ func TestGetCategoryID(t *testing.T) {
 
 		json.Unmarshal([]byte(res.Body.Bytes()), &result)
 		assert.Equal(t, 200, result.Code)
-		assert.Equal(t, "Success Get Data ID", result.Message)
+		assert.Equal(t, "Success Get Data", result.Message)
 		assert.True(t, result.Status)
 		assert.NotNil(t, result.Data)
 	})
@@ -241,12 +285,100 @@ func TestGetCategoryID(t *testing.T) {
 
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address/:id")
+		context.SetPath("/user/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("1")
-		GetCat := NewControlCategory(&errMockCategory{}, validator.New())
+		Produk := New(&errMockProduct{}, validator.New())
 
-		GetCat.GetCategoryID()(context)
+		Produk.GetProdukbySeller()(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 404, result.Code)
+		assert.Equal(t, "Data Not Found", result.Message)
+		assert.False(t, result.Status)
+	})
+	t.Run("Error Convert ID", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("C")
+		produk := New(&errMockProduct{}, validator.New())
+
+		produk.GetProdukbySeller()(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 406, result.Code)
+		assert.Equal(t, "Cannot Convert ID", result.Message)
+		assert.False(t, result.Status)
+	})
+}
+
+func TestGetProdukByCategory(t *testing.T) {
+	t.Run("Success Get Produk By Category", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/category/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("1")
+		Produk := New(&mockProduct{}, validator.New())
+
+		Produk.GetProdukByCategory()(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+			Data    interface{}
+		}
+
+		var result Response
+
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+		assert.Equal(t, 200, result.Code)
+		assert.Equal(t, "Success Get All data", result.Message)
+		assert.True(t, result.Status)
+		assert.NotNil(t, result.Data)
+	})
+	t.Run("Error Not Found", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/category/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("1")
+		Produk := New(&errMockProduct{}, validator.New())
+
+		Produk.GetProdukByCategory()(context)
 
 		type Response struct {
 			Code    int
@@ -272,9 +404,9 @@ func TestGetCategoryID(t *testing.T) {
 		context.SetPath("/category/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("C")
-		GetCat := NewControlCategory(&errMockCategory{}, validator.New())
+		produk := New(&errMockProduct{}, validator.New())
 
-		GetCat.GetCategoryID()(context)
+		produk.GetProdukByCategory()(context)
 
 		type Response struct {
 			Code    int
@@ -291,23 +423,26 @@ func TestGetCategoryID(t *testing.T) {
 	})
 }
 
-func TestUpdateAddress(t *testing.T) {
+func TestUpdateProduk(t *testing.T) {
 	t.Run("Update Success", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
-			"name": "kecantikan",
+			"name":        "tango coklat",
+			"stock":       10,
+			"price":       10000,
+			"description": "wafer coklat enak",
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category/:id")
+		context.SetPath("/product/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("1")
-		GetCat := NewControlCategory(&mockCategory{}, validator.New())
+		Prod := New(&mockProduct{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCat.UpdateCat())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(Prod.UpdateProduk())(context)
 
 		type Response struct {
 			Code    int
@@ -332,12 +467,12 @@ func TestUpdateAddress(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category/:id")
+		context.SetPath("/product/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("7")
-		GetCat := NewControlCategory(&errMockCategory{}, validator.New())
+		Prod := New(&errMockProduct{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCat.UpdateCat())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(Prod.UpdateProduk())(context)
 
 		type Response struct {
 			Code    int
@@ -354,18 +489,18 @@ func TestUpdateAddress(t *testing.T) {
 	})
 	t.Run("Error Bind", func(t *testing.T) {
 		e := echo.New()
-		requestBody := "kecantikan"
+		requestBody := "Tango"
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(requestBody))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category/:id")
+		context.SetPath("/product/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("7")
-		catego := NewControlCategory(&errMockCategory{}, validator.New())
+		Prod := New(&errMockProduct{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(catego.UpdateCat())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(Prod.UpdateProduk())(context)
 
 		type Response struct {
 			Code    int
@@ -387,12 +522,12 @@ func TestUpdateAddress(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category/:id")
+		context.SetPath("/address/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("C")
-		Getcategory := NewControlCategory(&errMockCategory{}, validator.New())
+		Prod := New(&errMockProduct{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(Getcategory.UpdateCat())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(Prod.UpdateProduk())(context)
 
 		type Response struct {
 			Code    int
@@ -409,8 +544,8 @@ func TestUpdateAddress(t *testing.T) {
 	})
 }
 
-func TestDeleteCategory(t *testing.T) {
-	t.Run("Success Delete Category", func(t *testing.T) {
+func TestDeleteProduk(t *testing.T) {
+	t.Run("Success Delete Produk", func(t *testing.T) {
 		e := echo.New()
 
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -418,12 +553,12 @@ func TestDeleteCategory(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category/:id")
+		context.SetPath("/product/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("7")
-		GetCat := NewControlCategory(&mockCategory{}, validator.New())
+		produk := New(&mockProduct{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCat.DeleteCat())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(produk.DeleteProduk())(context)
 
 		type Response struct {
 			Code    int
@@ -438,7 +573,7 @@ func TestDeleteCategory(t *testing.T) {
 		assert.Equal(t, "Deleted", result.Message)
 		assert.True(t, result.Status)
 	})
-	t.Run("Error Delete Category", func(t *testing.T) {
+	t.Run("Error Delete Produk", func(t *testing.T) {
 		e := echo.New()
 
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -446,12 +581,12 @@ func TestDeleteCategory(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/category/:id")
+		context.SetPath("/product/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("7")
-		GetCategory := NewControlCategory(&errMockCategory{}, validator.New())
+		Prod := New(&errMockProduct{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetCategory.DeleteCat())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(Prod.DeleteProduk())(context)
 
 		type Response struct {
 			Code    int
@@ -474,12 +609,12 @@ func TestDeleteCategory(t *testing.T) {
 		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
-		context.SetPath("/address/:id")
+		context.SetPath("/product/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("C")
-		Getcat := NewControlCategory(&errMockCategory{}, validator.New())
+		Prod := New(&errMockProduct{}, validator.New())
 
-		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(Getcat.DeleteCat())(context)
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(Prod.DeleteProduk())(context)
 
 		type Response struct {
 			Code    int
@@ -496,44 +631,55 @@ func TestDeleteCategory(t *testing.T) {
 	})
 }
 
-type mockCategory struct{}
+// MOCK SUCCESS
+type mockProduct struct {
+}
 
-func (m *mockCategory) CreateCategory(newAdd entities.Category) (entities.Category, error) {
-	return entities.Category{Name: "kecantikan"}, nil
+//METHOD MOCK SUCCESS
+func (s *mockProduct) InsertProduk(newProduk entities.Product) (entities.Product, error) {
+	return entities.Product{UserID: 1, CategoryID: 1, Name: "tango", Stock: 10, Price: 10000, Description: "wafer coklat"}, nil
 }
-func (m *mockCategory) GetAllCategory() ([]entities.Category, error) {
-	return []entities.Category{{Name: "kecantikan"}, {Name: "kesehatan"}}, nil
+
+func (s *mockProduct) GetProdbyID(id uint) (entities.Product, error) {
+	return entities.Product{UserID: 1, CategoryID: 1, Name: "tango", Stock: 10, Price: 10000, Description: "wafer coklat"}, nil
 }
-func (m *mockCategory) GetCategoryID(id uint) (entities.Category, error) {
-	return entities.Category{Name: "kecantikan"}, nil
+func (s *mockProduct) GetProdBySeller(UserID uint) ([]entities.Product, error) {
+	return []entities.Product{{UserID: 1, CategoryID: 1, Name: "tango", Stock: 10, Price: 10000, Description: "wafer coklat"}, {UserID: 1, CategoryID: 1, Name: "roti", Stock: 10, Price: 10000, Description: "roti kasur"}}, nil
 }
-func (m *mockCategory) UpdateCat(id uint, UpdateCat entities.Category, UserID uint) (entities.Category, error) {
-	return entities.Category{Name: "kecantikan"}, nil
+func (s *mockProduct) GetProdByCategory(id int) ([]entities.Product, error) {
+	return []entities.Product{{UserID: 1, CategoryID: 1, Name: "roti", Stock: 10, Price: 10000, Description: "roti kasur"}}, nil
 }
-func (m *mockCategory) DeleteCat(id uint, UserID uint) error {
+
+func (s *mockProduct) UpdateProduk(id int, UpdateProduk entities.Product, UserID uint) (entities.Product, error) {
+	return entities.Product{UserID: 1, CategoryID: 1, Name: "tango", Stock: 10, Price: 10000, Description: "wafer coklat"}, nil
+}
+func (s *mockProduct) DeleteProduk(id uint, UserID uint) error {
 	return nil
 }
 
-type errMockCategory struct {
+// MOCK ERROR
+type errMockProduct struct{}
+
+func (d *errMockProduct) InsertProduk(newProduk entities.Product) (entities.Product, error) {
+	return entities.Product{}, errors.New("Access Database Error")
 }
 
-// METHOD MOCK ERROR
-func (e *errMockCategory) CreateCategory(newAdd entities.Category) (entities.Category, error) {
-	return entities.Category{}, errors.New("Access Database Error")
+func (d *errMockProduct) GetProdbyID(id uint) (entities.Product, error) {
+	return entities.Product{}, errors.New("Access Database Error")
 }
 
-func (e *errMockCategory) GetAllCategory() ([]entities.Category, error) {
+func (d *errMockProduct) GetProdBySeller(UserID uint) ([]entities.Product, error) {
 	return nil, errors.New("Access Database Error")
 }
 
-func (e *errMockCategory) GetCategoryID(id uint) (entities.Category, error) {
-	return entities.Category{}, errors.New("Access Database Error")
+func (d *errMockProduct) GetProdByCategory(id int) ([]entities.Product, error) {
+	return nil, errors.New("Access Database Error")
 }
 
-func (e *errMockCategory) UpdateCat(id uint, UpdateCat entities.Category, UserID uint) (entities.Category, error) {
-	return entities.Category{}, errors.New("Access Database Error")
+func (d *errMockProduct) UpdateProduk(id int, UpdateProduk entities.Product, UserID uint) (entities.Product, error) {
+	return entities.Product{}, errors.New("Access Database Error")
 }
 
-func (e *errMockCategory) DeleteCat(id uint, UserID uint) error {
+func (d *errMockProduct) DeleteProduk(id uint, UserID uint) error {
 	return errors.New("Access Database Error")
 }

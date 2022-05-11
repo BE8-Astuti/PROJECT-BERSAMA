@@ -4,5 +4,6 @@ import "gorm.io/gorm"
 
 type Category struct {
 	gorm.Model
-	Name string `gorm:"name" json:"name" validate:"required"`
+	UserID int    `gorm:"user_id" json:"user_id" validate:"required"`
+	Name   string `gorm:"name" json:"name" validate:"required"`
 }
