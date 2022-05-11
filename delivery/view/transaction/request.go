@@ -1,8 +1,7 @@
 package transaction
 
 type InsertTransaction struct {
-	Address       string `json:"address"`
-	PaymentMethod string `json:"paymentMethod" validate:"required"`
+	Address string `json:"address" validate:"required"`
 }
 
 type InsertStatusTransaction struct {

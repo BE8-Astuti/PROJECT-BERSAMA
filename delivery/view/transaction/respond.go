@@ -19,7 +19,7 @@ func StatusGetAllOk(data []AllTrans) map[string]interface{} {
 	}
 }
 
-func StatusGetOrderOk(data interface{}) map[string]interface{} {
+func StatusTransactionDetail(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
 		"message": "Success Get Transaction Detail",
@@ -28,13 +28,12 @@ func StatusGetOrderOk(data interface{}) map[string]interface{} {
 	}
 }
 
-func StatusCreate(data entities.Transaction, snap map[string]interface{}) map[string]interface{} {
+func StatusCreate(OrderID string, snap map[string]interface{}) map[string]interface{} {
 	return map[string]interface{}{
-		"code":        http.StatusCreated,
-		"message":     "Success Create Transaction",
-		"status":      true,
-		"data":        data,
-		"RedirectUrl": snap,
+		"code":    http.StatusCreated,
+		"message": "Success Create Transaction",
+		"status":  true,
+		"data":    map[string]interface{}{"order-id": OrderID, "RedirectUrl": snap},
 	}
 }
 
@@ -52,5 +51,13 @@ func StatusCancelTrans() map[string]interface{} {
 		"code":    http.StatusOK,
 		"message": "Success Cancel Transaction",
 		"status":  true,
+	}
+}
+
+func StatusErrorSnap() map[string]interface{} {
+	return map[string]interface{}{
+		"code":    http.StatusNoContent,
+		"message": "Error Get Redirect Url Payment",
+		"status":  false,
 	}
 }

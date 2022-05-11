@@ -7,6 +7,14 @@ import (
 )
 
 type AppConfig struct {
+<<<<<<< HEAD
+	Port     int16
+	DBPort   int16
+	Host     string
+	User     string
+	Password string
+	DBName   string
+=======
 	Port     int
 	Driver   string
 	Name     string
@@ -14,6 +22,7 @@ type AppConfig struct {
 	DB_Port  int
 	Username string
 	Password string
+>>>>>>> 03362f06d487b54d41aeb62a1a3a89dd3f5a3e8b
 }
 
 var lock = &sync.Mutex{}
@@ -50,7 +59,19 @@ func getEnv(key, fallback string) string {
 		fmt.Println(value)
 		return value
 	}
+<<<<<<< HEAD
+	portconv, _ := strconv.Atoi(os.Getenv("PORT"))
+	res.Port = int16(portconv)
+	conv, _ := strconv.Atoi(os.Getenv("DBPORT"))
+	res.DBPort = int16(conv)
+	res.Host = os.Getenv("HOST")
+	res.User = os.Getenv("NAMEUSER")
+	res.Password = os.Getenv("PASSWORD")
+	res.DBName = os.Getenv("DBNAME")
+	return &res
+=======
 
 	return fallback
 
+>>>>>>> 03362f06d487b54d41aeb62a1a3a89dd3f5a3e8b
 }
