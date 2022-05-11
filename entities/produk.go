@@ -12,4 +12,5 @@ type Product struct {
 	Price       int    `json:"price"`
 	Description string `json:"description"`
 	Sold        int    `json:"sold" gorm:"default:0"`
+	UrlProduct  string `json:"urlProduct"`
 }

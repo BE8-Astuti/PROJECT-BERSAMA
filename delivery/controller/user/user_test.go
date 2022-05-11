@@ -126,7 +126,6 @@ func TestInsertUser(t *testing.T) {
 			"email":    "y@gmail.com",
 			"password": "849",
 			"phone":    "77979799",
-			"status":   "starseller",
 		})
 
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))

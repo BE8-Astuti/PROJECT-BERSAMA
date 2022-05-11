@@ -4,10 +4,17 @@ import (
 	"together/be8/config"
 	cAddress "together/be8/delivery/controller/address"
 	cCart "together/be8/delivery/controller/cart"
-	cTrans "together/be8/delivery/controller/transaction"
+	controllercat "together/be8/delivery/controller/category"
+	catRepo "together/be8/repository/category"
+
 	"together/be8/delivery/routes"
 	"together/be8/repository/address"
 	"together/be8/repository/cart"
+
+	controllerprod "together/be8/delivery/controller/product"
+	cTrans "together/be8/delivery/controller/transaction"
+
+	produkRepo "together/be8/repository/product"
 	"together/be8/repository/transaction"
 	"together/be8/utils"
 
@@ -33,6 +40,13 @@ func main() {
 	userRepo := userRepo.New(database)
 	userControl := controllerus.New(userRepo, validator.New())
 
+	productRepo := produkRepo.New(database)
+	productControl := controllerprod.New(*productRepo, validator.New())
+
+	catRepo := catRepo.NewDB(database)
+	categoryControl := controllercat.NewControlCategory(catRepo, validator.New())
+	// Initiate Echo
+
 	// Send Access DB to Transaction
 	snap := utils.InitMidtrans()
 	transRepo := transaction.NewTransDB(database)
@@ -41,6 +55,6 @@ func main() {
 	// Initiate Echo
 	e := echo.New()
 	// Akses Path Addressss
-	routes.Path(e, userControl, AddressControl, cartControl, transControl)
+	routes.Path(e, userControl, AddressControl, cartControl, transControl, categoryControl, productControl)
 	e.Logger.Fatal(e.Start(":8000"))
 }

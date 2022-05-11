@@ -2,12 +2,31 @@ package transaction
 
 import (
 	"net/http"
-	"together/be8/entities"
+	"time"
 )
 
+type RespondTransaction struct {
+	OrderID       string    `json:"orderID"`
+	TotalBill     int       `json:"totalBill"`
+	PaymentMethod string    `json:"paymentMethod"`
+	Address       string    `json:"address"`
+	Status        string    `json:"status"`
+	CreatedAt     time.Time `json:"createdAt"`
+}
+
+type ProductTransaction struct {
+	ProductID   uint   `json:"productId"`
+	NameSeller  string `json:"nameSeller"`
+	NameProduct string `json:"nameProduct" validate:"required"`
+	Qty         int    `json:"qty" validate:"required"`
+	Price       int    `json:"price" validate:"required"`
+	UrlProduct  string `json:"urlProduct"`
+	SubTotal    int    `json:"subTotal"`
+}
+
 type AllTrans struct {
-	TransDetail entities.Transaction
-	Product     []entities.Cart
+	TransDetail RespondTransaction
+	Product     []ProductTransaction
 }
 
 func StatusGetAllOk(data []AllTrans) map[string]interface{} {
@@ -37,7 +56,7 @@ func StatusCreate(OrderID string, snap map[string]interface{}) map[string]interf
 	}
 }
 
-func StatusPayTrans(data entities.Transaction) map[string]interface{} {
+func StatusPayTrans(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
 		"message": "Success Pay Transaction",

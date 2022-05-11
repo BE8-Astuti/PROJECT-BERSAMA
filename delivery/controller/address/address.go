@@ -57,7 +57,19 @@ func (r *ControlAddress) CreateAddress() echo.HandlerFunc {
 			log.Warn(errCreate)
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}
-		return c.JSON(http.StatusCreated, addressV.StatusCreate(result))
+
+		Response := addressV.RespondAddress{
+			AddressID:      result.ID,
+			Recipient:      result.Recipient,
+			HP:             result.HP,
+			Street:         result.Street,
+			SubDistrict:    result.SubDistrict,
+			UrbanVillage:   result.UrbanVillage,
+			City:           result.City,
+			Zip:            result.Zip,
+			AddressDefault: result.AddressDefault,
+		}
+		return c.JSON(http.StatusCreated, addressV.StatusCreate(Response))
 	}
 }
 
@@ -70,7 +82,22 @@ func (r *ControlAddress) GetAllAddress() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}
-		return c.JSON(http.StatusOK, addressV.StatusGetAllOk(result))
+		var GetAll []addressV.RespondAddress
+		for _, v := range result {
+			Response := addressV.RespondAddress{
+				AddressID:      v.ID,
+				Recipient:      v.Recipient,
+				HP:             v.HP,
+				Street:         v.Street,
+				SubDistrict:    v.SubDistrict,
+				UrbanVillage:   v.UrbanVillage,
+				City:           v.City,
+				Zip:            v.Zip,
+				AddressDefault: v.AddressDefault,
+			}
+			GetAll = append(GetAll, Response)
+		}
+		return c.JSON(http.StatusOK, addressV.StatusGetAllOk(GetAll))
 	}
 }
 
@@ -89,7 +116,18 @@ func (r *ControlAddress) GetAddressID() echo.HandlerFunc {
 			log.Warn(errGetAddressID)
 			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
-		return c.JSON(http.StatusOK, addressV.StatusGetIdOk(result))
+		Response := addressV.RespondAddress{
+			AddressID:      result.ID,
+			Recipient:      result.Recipient,
+			HP:             result.HP,
+			Street:         result.Street,
+			SubDistrict:    result.SubDistrict,
+			UrbanVillage:   result.UrbanVillage,
+			City:           result.City,
+			Zip:            result.Zip,
+			AddressDefault: result.AddressDefault,
+		}
+		return c.JSON(http.StatusOK, addressV.StatusGetIdOk(Response))
 	}
 }
 
@@ -123,7 +161,18 @@ func (r *ControlAddress) UpdateAddress() echo.HandlerFunc {
 			log.Warn(errNotFound)
 			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
-		return c.JSON(http.StatusOK, addressV.StatusUpdate(result))
+		Response := addressV.RespondAddress{
+			AddressID:      result.ID,
+			Recipient:      result.Recipient,
+			HP:             result.HP,
+			Street:         result.Street,
+			SubDistrict:    result.SubDistrict,
+			UrbanVillage:   result.UrbanVillage,
+			City:           result.City,
+			Zip:            result.Zip,
+			AddressDefault: result.AddressDefault,
+		}
+		return c.JSON(http.StatusOK, addressV.StatusUpdate(Response))
 	}
 }
 

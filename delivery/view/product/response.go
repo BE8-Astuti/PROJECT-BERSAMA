@@ -1,19 +1,20 @@
-package address
+package product
 
 import (
 	"net/http"
 )
 
-type RespondAddress struct {
-	AddressID      uint   `json:"addressId"`
-	Recipient      string `json:"recipient"`
-	HP             string `json:"hp"`
-	Street         string `json:"street"`
-	SubDistrict    string `json:"subDistrict"`
-	UrbanVillage   string `json:"urbanVillage"`
-	City           string `json:"city"`
-	Zip            string `json:"zip"`
-	AddressDefault string `json:"addressDefault"`
+type RespondProduct struct {
+	ProductID   uint   `json:"productId"`
+	UserID      uint   `json:"userId"`
+	CategoryID  uint   `json:"categoryId"`
+	Name        string `json:"name"`
+	NameSeller  string `json:"nameSeller"`
+	Stock       int    `json:"stock"`
+	Price       int    `json:"price"`
+	Description string `json:"description"`
+	Sold        int    `json:"sold" gorm:"default:0"`
+	UrlProduct  string `json:"urlProduct"`
 }
 
 func StatusGetAllOk(data interface{}) map[string]interface{} {
@@ -37,7 +38,7 @@ func StatusGetIdOk(data interface{}) map[string]interface{} {
 func StatusCreate(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusCreated,
-		"message": "Success Create Address",
+		"message": "Success Create Product",
 		"status":  true,
 		"data":    data,
 	}
@@ -49,13 +50,5 @@ func StatusUpdate(data interface{}) map[string]interface{} {
 		"message": "Updated",
 		"status":  true,
 		"data":    data,
-	}
-}
-
-func StatusDefaultAddress() map[string]interface{} {
-	return map[string]interface{}{
-		"code":    http.StatusOK,
-		"message": "Update Default Address Success",
-		"status":  true,
 	}
 }

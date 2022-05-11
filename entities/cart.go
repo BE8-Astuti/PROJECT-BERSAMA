@@ -10,6 +10,7 @@ type Cart struct {
 	Price       int    `json:"price"`
 	ToBuy       string `json:"toBuy" gorm:"default:yes"`
 	OrderID     string `json:"orderID"`
+	UrlProduct  string `json:"urlProduct"`
 	UserID      uint
 	ProductID   uint
 }

@@ -3,16 +3,16 @@ package routes
 import (
 	"together/be8/delivery/controller/address"
 	"together/be8/delivery/controller/cart"
+	"together/be8/delivery/controller/category"
+	"together/be8/delivery/controller/product"
 	"together/be8/delivery/controller/transaction"
 	"together/be8/delivery/controller/user"
-
-	// cbook "together/be8/delivery/controller/book"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.CartControl, t transaction.TransController) {
+func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.CartControl, t transaction.TransController, cat category.CategoryControl, p product.ProductControl) {
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
@@ -29,6 +29,21 @@ func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.
 	user.GET("/:id", u.GetUserbyID(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	user.PUT("/:id", u.UpdateUserID(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	user.DELETE("/:id", u.DeleteUserID(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+
+	category := e.Group("/category")
+	category.PUT("/:id", cat.UpdateCat(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	category.DELETE("/:id", cat.DeleteCat(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	category.POST("", cat.CreateCategory(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	category.GET("", cat.GetAllCategory())
+	category.GET("/:id", cat.GetCategoryID())
+
+	product := e.Group("/product")
+	product.PUT("/:id", p.UpdateProduk(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	product.DELETE("/:id", p.DeleteProduk(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	product.POST("", p.InsertProd(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	product.GET("/user/:id", p.GetProdukbySeller())
+	product.GET("/category/:id", p.GetProdukByCategory())
+	product.GET("/:id", p.GetProID())
 
 	// Routes Addressy
 	Address := e.Group("/address")

@@ -427,10 +427,10 @@ func (m *mockTransaction) CreateTransaction(NewTransaction entities.Transaction)
 	return entities.Transaction{Address: "Kutai", OrderID: "Order-1"}, nil
 }
 func (m *mockTransaction) GetAllTransaction(UserID uint) ([]transaction.AllTrans, error) {
-	return []transaction.AllTrans{{TransDetail: entities.Transaction{OrderID: "Order-1"}, Product: []entities.Cart{{NameProduct: "Baju"}}}}, nil
+	return []transaction.AllTrans{{TransDetail: transaction.RespondTransaction{OrderID: "Order-1"}, Product: []transaction.ProductTransaction{{NameProduct: "Baju"}}}}, nil
 }
 func (m *mockTransaction) GetTransactionDetail(UserID uint, OrderID string) (transaction.AllTrans, error) {
-	return transaction.AllTrans{TransDetail: entities.Transaction{OrderID: "Order-1"}, Product: []entities.Cart{{NameProduct: "Baju"}}}, nil
+	return transaction.AllTrans{TransDetail: transaction.RespondTransaction{OrderID: "Order-1"}, Product: []transaction.ProductTransaction{{NameProduct: "Baju"}}}, nil
 }
 func (m *mockTransaction) PayTransaction(UserID uint, OrderID string) (entities.Transaction, error) {
 	return entities.Transaction{OrderID: "Order-1"}, nil
