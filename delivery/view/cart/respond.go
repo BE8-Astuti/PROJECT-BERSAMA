@@ -5,8 +5,6 @@ import (
 	"together/be8/entities"
 )
 
-<<<<<<< HEAD
-=======
 type CartProduct struct {
 	NameProduct string `json:"nameProduct" validate:"required"`
 	Qty         int    `json:"qty" validate:"required"`
@@ -26,7 +24,6 @@ type Shipment struct {
 	BillTotal int `json:"billTotal"`
 }
 
->>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 func StatusGetAllOk(data []GetCart, BillTotal int) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
@@ -63,8 +60,6 @@ func StatusUpdate(data entities.Cart) map[string]interface{} {
 		"data":    data,
 	}
 }
-<<<<<<< HEAD
-=======
 
 func ShipmentOk(data Shipment) map[string]interface{} {
 	return map[string]interface{}{
@@ -74,4 +69,3 @@ func ShipmentOk(data Shipment) map[string]interface{} {
 		"data":    data,
 	}
 }
->>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc

@@ -48,7 +48,6 @@ func (pc *ProdukController) InsertProd() echo.HandlerFunc {
 		id := middlewares.ExtractTokenUserId(c)
 		newProd := entities.Product{
 			UserID:      uint(id),
-			CategoryID:  tmpProd.CategoryID,
 			Name:        tmpProd.Name,
 			Stock:       tmpProd.Stock,
 			Price:       tmpProd.Price,

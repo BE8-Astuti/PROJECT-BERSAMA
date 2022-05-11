@@ -11,29 +11,13 @@ import (
 
 func InitDB() *gorm.DB {
 	config := InitConfig()
-<<<<<<< HEAD
-	conString := fmt.Sprintf("%s:@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
-		config.User,
-		config.Host,
-		config.DBPort,
-		config.DBName,
-=======
-<<<<<<< HEAD
-	conString := fmt.Sprintf("%s:@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
-		config.User,
-		// config.Password,
-		config.Host,
-		config.DBPort,
-		config.DBName,
-=======
+
 	conString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
 		config.Username,
 		config.Password,
 		config.Address,
 		config.DB_Port,
 		config.Name,
->>>>>>> 03362f06d487b54d41aeb62a1a3a89dd3f5a3e8b
->>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 	)
 
 	db, err := gorm.Open(mysql.Open(conString), &gorm.Config{})
@@ -44,9 +28,5 @@ func InitDB() *gorm.DB {
 }
 func Migrate() {
 	db := InitDB()
-<<<<<<< HEAD
-	db.AutoMigrate(&entities.User{}, &entities.Address{}, &entities.Cart{}, &entities.Category{}, entities.Product{})
-=======
 	db.AutoMigrate(&entities.User{}, &entities.Address{}, &entities.Cart{}, &entities.Category{}, entities.Product{}, entities.Transaction{})
->>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 }

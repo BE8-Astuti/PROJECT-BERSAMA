@@ -46,7 +46,7 @@ func TestCreateAddress(t *testing.T) {
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
 		context.SetPath("/address")
-		AddressC := NewControlAddress(&mockAddress{}, validator.New())
+		AddressC := NewControlAddress(&MockAddress{}, validator.New())
 
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(AddressC.CreateAddress())(context)
 
@@ -167,7 +167,7 @@ func TestGetAllAddress(t *testing.T) {
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
 		context.SetPath("/address")
-		GetAddress := NewControlAddress(&mockAddress{}, validator.New())
+		GetAddress := NewControlAddress(&MockAddress{}, validator.New())
 
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.GetAllAddress())(context)
 
@@ -226,7 +226,7 @@ func TestGetAddressID(t *testing.T) {
 		context.SetPath("/address/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("1")
-		GetAddress := NewControlAddress(&mockAddress{}, validator.New())
+		GetAddress := NewControlAddress(&MockAddress{}, validator.New())
 
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.GetAddressID())(context)
 
@@ -324,7 +324,7 @@ func TestUpdateAddress(t *testing.T) {
 		context.SetPath("/address/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("1")
-		GetAddress := NewControlAddress(&mockAddress{}, validator.New())
+		GetAddress := NewControlAddress(&MockAddress{}, validator.New())
 
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.UpdateAddress())(context)
 
@@ -441,7 +441,7 @@ func TestDeleteAddress(t *testing.T) {
 		context.SetPath("/address/:id")
 		context.SetParamNames("id")
 		context.SetParamValues("7")
-		GetAddress := NewControlAddress(&mockAddress{}, validator.New())
+		GetAddress := NewControlAddress(&MockAddress{}, validator.New())
 
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.DeleteAddress())(context)
 
@@ -529,7 +529,7 @@ func TestSetDefaultAddress(t *testing.T) {
 		context.SetPath("/address/:id/default")
 		context.SetParamNames("id")
 		context.SetParamValues("7")
-		GetAddress := NewControlAddress(&mockAddress{}, validator.New())
+		GetAddress := NewControlAddress(&MockAddress{}, validator.New())
 
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetAddress.SetDefaultAddress())(context)
 
@@ -605,32 +605,28 @@ func TestSetDefaultAddress(t *testing.T) {
 }
 
 // MOCK SUCCESS
-type mockAddress struct {
+type MockAddress struct {
 }
 
 //METHOD MOCK SUCCESS
-<<<<<<< HEAD
-func (m *mockAddress) CreateAddress(newAdd entities.Address) (entities.Address, error) {
-=======
-func (m *mockAddress) CreateAddress(newAdd entities.Address, UserID uint) (entities.Address, error) {
->>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
+func (m *MockAddress) CresteAddress(newAdd entities.Address, UserID uint) (entities.Address, error) {
 	return entities.Address{Recipient: "Galih", HP: "123456"}, nil
 }
-func (m *mockAddress) GetAllAddress(UserID uint) ([]entities.Address, error) {
+func (m *MockAddress) GetAllAddress(UserID uint) ([]entities.Address, error) {
 	return []entities.Address{{Recipient: "Galih", HP: "123456"}, {Recipient: "Nando", HP: "433112"}}, nil
 }
-func (m *mockAddress) GetAddressID(x uint, UserID uint) (entities.Address, error) {
+func (m *MockAddress) GetAddressID(x uint, UserID uint) (entities.Address, error) {
 	return entities.Address{Recipient: "Galih", HP: "123456"}, nil
 }
-func (m *mockAddress) UpdateAddress(id uint, updatedAddress entities.Address, UserID uint) (entities.Address, error) {
+func (m *MockAddress) UpdateAddress(id uint, updatedAddress entities.Address, UserID uint) (entities.Address, error) {
 	return entities.Address{Recipient: "Galih", HP: "123456"}, nil
 }
 
-func (m *mockAddress) DeleteAddress(id uint, UserID uint) error {
+func (m *MockAddress) DeleteAddress(id uint, UserID uint) error {
 	return nil
 }
 
-func (m *mockAddress) SetDefaultAddress(id uint, UserID uint) error {
+func (m *MockAddress) SetDefaultAddress(id uint, UserID uint) error {
 	return nil
 }
 
@@ -639,11 +635,8 @@ type errMockAddress struct {
 }
 
 // METHOD MOCK ERROR
-<<<<<<< HEAD
-func (e *errMockAddress) CreateAddress(newAdd entities.Address) (entities.Address, error) {
-=======
+
 func (e *errMockAddress) CreateAddress(newAdd entities.Address, UserID uint) (entities.Address, error) {
->>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 	return entities.Address{}, errors.New("Access Database Error")
 }
 

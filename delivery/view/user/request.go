@@ -12,12 +12,8 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 type UpdateUserRequest struct {
-<<<<<<< HEAD
-	Email string `json:"email" validate:"required"`
-=======
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	Phone    string `json:"phone"`
->>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 }

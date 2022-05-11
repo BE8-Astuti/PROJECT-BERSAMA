@@ -20,15 +20,11 @@ func NewDB(db *gorm.DB) *AddressDB {
 }
 
 // CREATE NEW ADDRESS TO DATABASE
-<<<<<<< HEAD
-func (a *AddressDB) CreateAddress(newAdd entities.Address) (entities.Address, error) {
-=======
 func (a *AddressDB) CreateAddress(newAdd entities.Address, UserID uint) (entities.Address, error) {
 	CheckAddress, _ := a.GetAllAddress(UserID)
 	if len(CheckAddress) == 0 {
 		newAdd.AddressDefault = "yes"
 	}
->>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 	if err := a.Db.Create(&newAdd).Error; err != nil {
 		log.Warn(err)
 		return newAdd, err
