@@ -13,8 +13,8 @@ import (
 
 	controllerprod "together/be8/delivery/controller/product"
 	cTrans "together/be8/delivery/controller/transaction"
+	rprod "together/be8/repository/product"
 
-	produkRepo "together/be8/repository/product"
 	"together/be8/repository/transaction"
 	"together/be8/utils"
 
@@ -40,8 +40,8 @@ func main() {
 	userRepo := userRepo.New(database)
 	userControl := controllerus.New(userRepo, validator.New())
 
-	productRepo := produkRepo.New(database)
-	productControl := controllerprod.New(*productRepo, validator.New())
+	prodrep := rprod.New(database)
+	productControl := controllerprod.New(prodrep, validator.New())
 
 	catRepo := catRepo.NewDB(database)
 	categoryControl := controllercat.NewControlCategory(catRepo, validator.New())

@@ -657,7 +657,7 @@ func (mur *mockUserRepository) GetUserID(ID int) (entities.User, error) {
 	return entities.User{Name: "Astuti", Phone: "7897787", Email: "a@gmail.com", Status: "starseller"}, nil
 }
 
-func (mur *mockUserRepository) UpdateUser(ID int, email string) (entities.User, error) {
+func (mur *mockUserRepository) UpdateUser(ID int, update entities.User) (entities.User, error) {
 	return entities.User{Name: "Astuti", Phone: "7897787", Email: "a@gmail.com", Status: "starseller"}, nil
 }
 
@@ -689,6 +689,6 @@ func (emur *erorrMockUserRepository) GetUserID(ID int) (entities.User, error) {
 func (emur *erorrMockUserRepository) Login(email, password string) (entities.User, error) {
 	return entities.User{}, errors.New("tidak bisa select data")
 }
-func (emur *erorrMockUserRepository) UpdateUser(ID int, email string) (entities.User, error) {
+func (emur *erorrMockUserRepository) UpdateUser(ID int, update entities.User) (entities.User, error) {
 	return entities.User{}, errors.New("tidak bisa select data")
 }

@@ -55,7 +55,7 @@ func (pr *ProdukRepo) GetProdByCategory(id int) ([]entities.Product, error) {
 	return produks, nil
 }
 
-func (pr *ProdukRepo) UpdateProduk(id uint, UpdateProduk entities.Product, UserID uint) (entities.Product, error) {
+func (pr *ProdukRepo) UpdateProduk(id int, UpdateProduk entities.Product, UserID uint) (entities.Product, error) {
 	var produks entities.Product
 
 	if err := pr.Db.Where("id =? AND user_id =?", id, UserID).First(&produks).Updates(&UpdateProduk).Find(&produks).Error; err != nil {

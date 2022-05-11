@@ -29,7 +29,7 @@ func StatusGetAllOk(data interface{}) map[string]interface{} {
 func StatusGetIdOk(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
-		"message": "Success Get Data ID",
+		"message": "Success Get Data",
 		"status":  true,
 		"data":    data,
 	}
