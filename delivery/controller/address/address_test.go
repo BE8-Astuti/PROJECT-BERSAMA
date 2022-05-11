@@ -609,7 +609,11 @@ type mockAddress struct {
 }
 
 //METHOD MOCK SUCCESS
+<<<<<<< HEAD
 func (m *mockAddress) CreateAddress(newAdd entities.Address) (entities.Address, error) {
+=======
+func (m *mockAddress) CreateAddress(newAdd entities.Address, UserID uint) (entities.Address, error) {
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 	return entities.Address{Recipient: "Galih", HP: "123456"}, nil
 }
 func (m *mockAddress) GetAllAddress(UserID uint) ([]entities.Address, error) {
@@ -635,7 +639,11 @@ type errMockAddress struct {
 }
 
 // METHOD MOCK ERROR
+<<<<<<< HEAD
 func (e *errMockAddress) CreateAddress(newAdd entities.Address) (entities.Address, error) {
+=======
+func (e *errMockAddress) CreateAddress(newAdd entities.Address, UserID uint) (entities.Address, error) {
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 	return entities.Address{}, errors.New("Access Database Error")
 }
 

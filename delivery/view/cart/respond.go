@@ -5,6 +5,28 @@ import (
 	"together/be8/entities"
 )
 
+<<<<<<< HEAD
+=======
+type CartProduct struct {
+	NameProduct string `json:"nameProduct" validate:"required"`
+	Qty         int    `json:"qty" validate:"required"`
+	Price       int    `json:"price" validate:"required"`
+	ToBuy       string `json:"toBuy" validate:"required"`
+}
+
+type GetCart struct {
+	NameSeller string        `json:"nameSeller"`
+	Product    []CartProduct `json:"product"`
+	SubTotal   int           `json:"subTotal"`
+}
+
+type Shipment struct {
+	Address   entities.Address `json:"address"`
+	Product   []GetCart
+	BillTotal int `json:"billTotal"`
+}
+
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 func StatusGetAllOk(data []GetCart, BillTotal int) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
@@ -41,3 +63,15 @@ func StatusUpdate(data entities.Cart) map[string]interface{} {
 		"data":    data,
 	}
 }
+<<<<<<< HEAD
+=======
+
+func ShipmentOk(data Shipment) map[string]interface{} {
+	return map[string]interface{}{
+		"code":    http.StatusOK,
+		"message": "Success Get Data Shipment",
+		"status":  true,
+		"data":    data,
+	}
+}
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc

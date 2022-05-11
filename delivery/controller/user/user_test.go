@@ -20,6 +20,7 @@ import (
 
 func TestCreateToken(t *testing.T) {
 	t.Run("Create Token", func(t *testing.T) {
+<<<<<<< HEAD
 		token, _ = middlewares.CreateToken(2, "Yani", "y@gmail.com")
 	})
 }
@@ -73,6 +74,12 @@ func TestCreateToken(t *testing.T) {
 // 	})
 // }
 
+=======
+		token, _ = middlewares.CreateToken(3, "Yani", "y@gmail.com")
+	})
+}
+
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 func TestInsertUser(t *testing.T) {
 	t.Run("Success Insert", func(t *testing.T) {
 		e := echo.New()
@@ -171,8 +178,16 @@ func TestInsertUser(t *testing.T) {
 	t.Run("Error Insert DB", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
+<<<<<<< HEAD
 			"name":  "yani",
 			"phone": "779",
+=======
+			"name":     "yani",
+			"email":    "y@gmail.com",
+			"password": "849",
+			"phone":    "77979799",
+			"status":   "starseller",
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 		})
 
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
@@ -196,7 +211,11 @@ func TestInsertUser(t *testing.T) {
 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
 		assert.False(t, resp.Status)
 		assert.Nil(t, resp.Data)
+<<<<<<< HEAD
 		assert.Equal(t, 406, resp.Code)
+=======
+		assert.Equal(t, 500, resp.Code)
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 	})
 }
 
@@ -210,7 +229,11 @@ func TestGetUserbyID(t *testing.T) {
 		context := e.NewContext(req, res)
 		context.SetPath("/user/:id")
 		context.SetParamNames("id")
+<<<<<<< HEAD
 		context.SetParamValues("2")
+=======
+		context.SetParamValues("3")
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 		GetUser := New(&mockUserRepository{}, validator.New())
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.GetUserbyID())(context)
 		type Response struct {
@@ -263,6 +286,37 @@ func TestGetUserbyID(t *testing.T) {
 		context := e.NewContext(req, res)
 		context.SetPath("/user/:id")
 		context.SetParamNames("id")
+<<<<<<< HEAD
+=======
+		context.SetParamValues("3")
+
+		userController := New(&erorrMockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(userController.GetUserbyID())(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+			Data    interface{}
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 404, result.Code)
+		assert.Equal(t, "Data Not Found", result.Message)
+		assert.False(t, result.Status)
+	})
+	t.Run("Error Not Found", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 		context.SetParamValues("2")
 
 		userController := New(&erorrMockUserRepository{}, validator.New())
@@ -318,9 +372,13 @@ func TestUpdateUserID(t *testing.T) {
 	})
 	t.Run("Error Bind", func(t *testing.T) {
 		e := echo.New()
+<<<<<<< HEAD
 		requestBody, _ := json.Marshal(map[string]interface{}{
 			"phone": "779",
 		})
+=======
+		requestBody := "Error Bind"
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -347,7 +405,11 @@ func TestUpdateUserID(t *testing.T) {
 		log.Warn(resp)
 		assert.False(t, resp.Status)
 		assert.Nil(t, resp.Data)
+<<<<<<< HEAD
 		assert.Equal(t, 500, resp.Code)
+=======
+		assert.Equal(t, 415, resp.Code)
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 	})
 	t.Run("Error Konversi", func(t *testing.T) {
 		e := echo.New()
@@ -385,7 +447,11 @@ func TestUpdateUserID(t *testing.T) {
 		context := e.NewContext(req, res)
 		context.SetPath("/address/:id")
 		context.SetParamNames("id")
+<<<<<<< HEAD
 		context.SetParamValues("7")
+=======
+		context.SetParamValues("3")
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 		GetUser := New(&erorrMockUserRepository{}, validator.New())
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.UpdateUserID())(context)
 		type Response struct {
@@ -401,7 +467,38 @@ func TestUpdateUserID(t *testing.T) {
 		assert.Equal(t, "Cannot Access Database", result.Message)
 		assert.False(t, result.Status)
 	})
+<<<<<<< HEAD
 
+=======
+	t.Run("Error Not Found Access Token", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("2")
+
+		userController := New(&erorrMockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(userController.UpdateUserID())(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+			Data    interface{}
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 404, result.Code)
+		assert.Equal(t, "Data Not Found", result.Message)
+		assert.False(t, result.Status)
+	})
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 }
 
 func TestDeleteUserID(t *testing.T) {
@@ -416,7 +513,11 @@ func TestDeleteUserID(t *testing.T) {
 		context := e.NewContext(req, res)
 		context.SetPath("/user/:id")
 		context.SetParamNames("id")
+<<<<<<< HEAD
 		context.SetParamValues("5")
+=======
+		context.SetParamValues("3")
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 		GetUser := New(&mockUserRepository{}, validator.New())
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.DeleteUserID())(context)
 		type Response struct {
@@ -468,7 +569,11 @@ func TestDeleteUserID(t *testing.T) {
 		context := e.NewContext(req, res)
 		context.SetPath("/user/:id")
 		context.SetParamNames("id")
+<<<<<<< HEAD
 		context.SetParamValues("7")
+=======
+		context.SetParamValues("3")
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 		GetUser := New(&erorrMockUserRepository{}, validator.New())
 		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.DeleteUserID())(context)
 		type Response struct {
@@ -484,6 +589,35 @@ func TestDeleteUserID(t *testing.T) {
 		assert.NotEqual(t, "data tidak dapat didelete", result.Message)
 		assert.False(t, result.Status)
 	})
+<<<<<<< HEAD
+=======
+	t.Run("Error Not Found Access Token", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/user/:id")
+		context.SetParamNames("id")
+		context.SetParamValues("6")
+		GetUser := New(&erorrMockUserRepository{}, validator.New())
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetUser.DeleteUserID())(context)
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 404, result.Code)
+		assert.Equal(t, "Data Not Found", result.Message)
+		assert.False(t, result.Status)
+	})
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 }
 
 var token string
@@ -579,7 +713,38 @@ func TestLogin(t *testing.T) {
 		assert.Nil(t, resp.Data)
 		assert.Equal(t, 415, resp.Code)
 	})
+<<<<<<< HEAD
 
+=======
+	t.Run("Error Login", func(t *testing.T) {
+		e := echo.New()
+		requestBody, _ := json.Marshal(map[string]interface{}{
+			"email":    "y@gmail.com",
+			"password": "yani",
+		})
+		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/login")
+
+		controller := New(&erorrMockUserRepository{}, validator.New())
+		controller.Login()(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 404, result.Code)
+		assert.Equal(t, "Data Not Found", result.Message)
+		assert.False(t, result.Status)
+	})
+>>>>>>> fbedbae8ed32763c12abe5f92c0cbd8da656f0dc
 }
 
 // Dummy Data

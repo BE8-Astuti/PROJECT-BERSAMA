@@ -1,24 +1,25 @@
 package routes
 
 import (
-
-	// cbook "together/be8/delivery/controller/book"
-
 	"together/be8/delivery/controller/address"
 	"together/be8/delivery/controller/cart"
 	"together/be8/delivery/controller/category"
 	"together/be8/delivery/controller/product"
+	"together/be8/delivery/controller/transaction"
 	"together/be8/delivery/controller/user"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.CartControl, t category.CategoryControl, p product.ProductControl) {
+func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.CartControl, t transaction.TransController, cat category.CategoryControl, p product.ProductControl) {
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
-
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"https://labstack.com", "https://labstack.net"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
 	// Login
 	e.POST("/login", u.Login())
 	// ROUTES USER
@@ -30,11 +31,11 @@ func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.
 	user.DELETE("/:id", u.DeleteUserID(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 
 	category := e.Group("/category")
-	category.PUT("/:id", t.UpdateCat(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
-	category.DELETE("/:id", t.DeleteCat(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
-	category.POST("", t.CreateCategory(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
-	category.GET("", t.GetAllCategory())
-	category.GET("/:id", t.GetCategoryID())
+	category.PUT("/:id", cat.UpdateCat(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	category.DELETE("/:id", cat.DeleteCat(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	category.POST("", cat.CreateCategory(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	category.GET("", cat.GetAllCategory())
+	category.GET("/:id", cat.GetCategoryID())
 
 	product := e.Group("/product")
 	product.PUT("/:id", p.UpdateProduk(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
@@ -57,7 +58,15 @@ func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.
 	Cart := e.Group("/cart")
 	Cart.POST("", c.CreateCart(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	Cart.GET("", c.GetAllCart(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
-	Cart.GET("/:id", c.GetCartID(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	Cart.PUT("/:id", c.UpdateCart(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	Cart.DELETE("/:id", c.DeleteCart(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	Cart.GET("/shipment", c.Shipment(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+
+	// ROUTES TRANSACTION
+	Transaction := e.Group("/transaction")
+	Transaction.POST("", t.CreateTransaction(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	Transaction.GET("", t.GetAllTransaction(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	Transaction.GET("/:order_id", t.GetTransactionDetail(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	Transaction.POST("/:order_id/pay", t.PayTransaction(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	Transaction.POST("/:order_id/cancel", t.CancelTransaction(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 }
