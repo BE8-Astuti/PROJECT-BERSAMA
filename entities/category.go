@@ -4,7 +4,5 @@ import "gorm.io/gorm"
 
 type Category struct {
 	gorm.Model
-	UserID  uint      `json:"userid"`
-	Name    string    `json:"name"`
-	Product []Product `gorm:"foreignKey:category_id"`
+	Name string `gorm:"name" json:"name" validate:"required"`
 }

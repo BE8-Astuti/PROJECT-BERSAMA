@@ -41,10 +41,10 @@ func (r *ControlCategory) CreateCategory() echo.HandlerFunc {
 			log.Warn(err)
 			return c.JSON(http.StatusNotAcceptable, view.Validate())
 		}
-		UserID := middlewares.ExtractTokenUserId(c)
+
 		NewAdd := entities.Category{
-			UserID: uint(UserID),
-			Name:   Insert.Name,
+
+			Name: Insert.Name,
 		}
 		result, errCreate := r.Repo.CreateCategory(NewAdd)
 		if errCreate != nil {
