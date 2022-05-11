@@ -27,6 +27,9 @@ func (t *TransDB) CreateTransaction(NewTransaction entities.Transaction) (entiti
 	if err := t.Db.Where("user_id=? AND to_buy='yes'", NewTransaction.UserID).Find(&Carts).Error; err != nil {
 		return NewTransaction, err
 	}
+	if len(Carts) == 0 {
+		return NewTransaction, errors.New("Data Not Found")
+	}
 	var totalbill int
 	for _, v := range Carts {
 		totalbill += v.Qty * v.Price

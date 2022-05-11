@@ -102,7 +102,7 @@ func (uc *UserController) UpdateUserID() echo.HandlerFunc {
 		}
 		UpdateUser := entities.User{Email: update.Email, Name: update.Name, Password: update.Password, Phone: update.Phone}
 
-		res, err := uc.Repo.UpdateUser(id, UpdateUser.Email)
+		res, err := uc.Repo.UpdateUser(id, UpdateUser)
 
 		if err != nil {
 			log.Warn(err)

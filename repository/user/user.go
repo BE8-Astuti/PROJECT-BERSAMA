@@ -40,23 +40,6 @@ func (ur *UserRepo) InsertUser(newUser entities.User) (entities.User, error) {
 	return newUser, nil
 }
 
-// func (ur *UserRepo) GetAllUser() ([]entities.User, error) {
-// 	arrUser := []entities.User{}
-
-// 	if err := ur.Db.Find(&arrUser).Error; err != nil {
-// 		log.Warn(err)
-// 		return nil, errors.New("tidak bisa select data")
-// 	}
-
-// 	if len(arrUser) == 0 {
-// 		log.Warn("tidak ada data")
-// 		return nil, errors.New("tidak ada data")
-// 	}
-
-// 	log.Info()
-// 	return arrUser, nil
-// }
-
 func (ur *UserRepo) GetUserID(ID int) (entities.User, error) {
 	arrUser := []entities.User{}
 
@@ -74,12 +57,12 @@ func (ur *UserRepo) GetUserID(ID int) (entities.User, error) {
 	return arrUser[0], nil
 }
 
-func (ur *UserRepo) UpdateUser(ID int, email string) (entities.User, error) {
-	if err := ur.Db.Model(entities.User{}).Where("id = ?", ID).Update("email", email).Error; err != nil {
+func (ur *UserRepo) UpdateUser(ID int, update entities.User) (entities.User, error) {
+	var res entities.User
+	if err := ur.Db.Where("id = ?", ID).Updates(&update).Find(&res).Error; err != nil {
 		log.Warn(err)
 		return entities.User{}, errors.New("tidak bisa update data")
 	}
-	res, _ := ur.GetUserID(ID)
 
 	log.Info()
 	return res, nil

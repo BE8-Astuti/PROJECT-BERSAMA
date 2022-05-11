@@ -29,12 +29,12 @@ func TestInsertProd(t *testing.T) {
 	t.Run("Create Success", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
-			"user_id":     1,
-			"category_id": 1,
-			"name":        "tango",
-			"stock":       10,
-			"price":       10000,
-			"description": "wafer coklat",
+			"categoryId":  1,
+			"nameSeller":  "Xiaomi",
+			"name":        "Poco X3",
+			"stock":       17,
+			"price":       1500000,
+			"description": "Barang Bagus",
 		})
 
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
@@ -66,12 +66,12 @@ func TestInsertProd(t *testing.T) {
 	t.Run("Error Access Database", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
-			"user_id":     1,
-			"category_id": 1,
-			"name":        "tango",
-			"stock":       10,
-			"price":       10000,
-			"description": "wafer coklat",
+			"categoryId":  1,
+			"nameSeller":  "Xiaomi",
+			"name":        "Poco X3",
+			"stock":       17,
+			"price":       1500000,
+			"description": "Barang Bagus",
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)

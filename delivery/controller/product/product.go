@@ -47,6 +47,7 @@ func (pc *ProdukController) InsertProd() echo.HandlerFunc {
 		newProd := entities.Product{
 			UserID:      uint(id),
 			CategoryID:  uint(tmpProd.CategoryID),
+			NameSeller:  tmpProd.NameSeller,
 			Name:        tmpProd.Name,
 			Stock:       tmpProd.Stock,
 			Price:       tmpProd.Price,
