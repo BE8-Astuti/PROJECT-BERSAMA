@@ -39,7 +39,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/OnlineShop:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/onlineshop:latest
       - 
         name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
