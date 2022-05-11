@@ -11,11 +11,12 @@ import (
 
 func InitDB() *gorm.DB {
 	config := InitConfig()
-	conString := fmt.Sprintf("%s:@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
-		config.User,
-		config.Host,
-		config.DBPort,
-		config.DBName,
+	conString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
+		config.Username,
+		config.Password,
+		config.Address,
+		config.DB_Port,
+		config.Name,
 	)
 
 	db, err := gorm.Open(mysql.Open(conString), &gorm.Config{})

@@ -1,48 +1,56 @@
 package config
 
 import (
+	"fmt"
 	"os"
-	"strconv"
-
-	"github.com/joho/godotenv"
-	"github.com/labstack/gommon/log"
+	"sync"
 )
 
 type AppConfig struct {
-	Port   int16
-	DBPort int16
-	Host   string
-	User   string
-
-	DBName string
+	Port     int
+	Driver   string
+	Name     string
+	Address  string
+	DB_Port  int
+	Username string
+	Password string
 }
+
+var lock = &sync.Mutex{}
+var appConfig *AppConfig
 
 func InitConfig() *AppConfig {
-	var app *AppConfig
+	lock.Lock()
+	defer lock.Unlock()
 
-	app = GetConfig()
-	if app == nil {
-		log.Fatal("Cannot init config")
-		return nil
+	if appConfig == nil {
+		appConfig = initConfig()
 	}
-	return app
+
+	return appConfig
 }
 
-func GetConfig() *AppConfig {
-	var res AppConfig
-	err := godotenv.Load("local.env")
+func initConfig() *AppConfig {
+	var defaultConfig AppConfig
+	defaultConfig.Port = 8000
+	defaultConfig.Driver = getEnv("DRIVER", "mysql")
+	defaultConfig.Name = getEnv("NAME", "layered_db")
+	defaultConfig.Address = getEnv("ADDRESS", "localhost")
+	defaultConfig.DB_Port = 3306
+	defaultConfig.Username = getEnv("USERNAME", "root")
+	defaultConfig.Password = getEnv("PASSWORD", "")
 
-	if err != nil {
-		log.Fatal("Cannot open config file")
-		return nil
+	fmt.Println(defaultConfig)
+
+	return &defaultConfig
+}
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		fmt.Println(value)
+		return value
 	}
-	portconv, _ := strconv.Atoi(os.Getenv("PORT"))
-	res.Port = int16(portconv)
-	conv, _ := strconv.Atoi(os.Getenv("DBPORT"))
-	res.DBPort = int16(conv)
-	res.Host = os.Getenv("HOST")
-	res.User = os.Getenv("NAMEUSER")
 
-	res.DBName = os.Getenv("DBNAME")
-	return &res
+	return fallback
+
 }
