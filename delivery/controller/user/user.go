@@ -47,8 +47,11 @@ func (uc *UserController) InsertUser() echo.HandlerFunc {
 			log.Warn("masalah pada server")
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}
+
+		response := userview.RespondUser{Name: res.Name, Username: res.Username, Email: res.Email, Phone: res.Phone, UserID: res.ID}
+
 		log.Info("berhasil insert")
-		return c.JSON(http.StatusCreated, userview.SuccessInsert(res))
+		return c.JSON(http.StatusCreated, userview.SuccessInsert(response))
 	}
 }
 
@@ -66,15 +69,15 @@ func (uc *UserController) GetUserbyID() echo.HandlerFunc {
 			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
 
-		hasil, err := uc.Repo.GetUserID(convID)
+		res, err := uc.Repo.GetUserID(convID)
 
 		if err != nil {
 			log.Warn()
 			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
+		response := userview.RespondUser{Name: res.Name, Username: res.Username, Email: res.Email, Phone: res.Phone, UserID: res.ID}
 
-		return c.JSON(http.StatusOK, userview.StatusGetIdOk(hasil))
-
+		return c.JSON(http.StatusOK, userview.StatusGetIdOk(response))
 	}
 
 }
@@ -99,7 +102,7 @@ func (uc *UserController) UpdateUserID() echo.HandlerFunc {
 		}
 		UpdateUser := entities.User{Email: update.Email, Name: update.Name, Password: update.Password, Phone: update.Phone}
 
-		hasil, err := uc.Repo.UpdateUser(id, UpdateUser.Email)
+		res, err := uc.Repo.UpdateUser(id, UpdateUser.Email)
 
 		if err != nil {
 			log.Warn(err)
@@ -110,8 +113,9 @@ func (uc *UserController) UpdateUserID() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 
 		}
+		response := userview.RespondUser{Name: res.Name, Username: res.Username, Email: res.Email, Phone: res.Phone, UserID: res.ID}
 
-		return c.JSON(http.StatusOK, userview.StatusUpdate(hasil))
+		return c.JSON(http.StatusOK, userview.StatusUpdate(response))
 	}
 
 }

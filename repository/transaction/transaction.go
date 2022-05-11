@@ -63,14 +63,33 @@ func (t *TransDB) GetAllTransaction(UserID uint) ([]transaction.AllTrans, error)
 
 	for _, v := range AllTransaction {
 		var resTrans transaction.AllTrans
-		resTrans.TransDetail = v
-		var cards []entities.Cart
-		if err := t.Db.Unscoped().Where("order_id", v.OrderID).Find(&cards).Error; err != nil {
+		resTrans.TransDetail = transaction.RespondTransaction{
+			OrderID:       v.OrderID,
+			TotalBill:     v.TotalBill,
+			PaymentMethod: v.PaymentMethod,
+			Address:       v.Address,
+			Status:        v.Status,
+			CreatedAt:     v.CreatedAt,
+		}
+		var carts []entities.Cart
+		if err := t.Db.Unscoped().Where("order_id=?", v.OrderID).Order("name_seller").Find(&carts).Error; err != nil {
 			log.Warn("Error Get All Transaction", err)
 			return resAllTrans, errors.New("Access Database Error")
 		}
-		fmt.Println(cards)
-		resTrans.Product = cards
+		var AllProducts []transaction.ProductTransaction
+		for _, v := range carts {
+			Product := transaction.ProductTransaction{
+				ProductID:   v.ProductID,
+				NameSeller:  v.NameSeller,
+				NameProduct: v.NameProduct,
+				Qty:         v.Qty,
+				Price:       v.Price,
+				UrlProduct:  v.UrlProduct,
+				SubTotal:    v.Qty * v.Price,
+			}
+			AllProducts = append(AllProducts, Product)
+		}
+		resTrans.Product = AllProducts
 		resAllTrans = append(resAllTrans, resTrans)
 	}
 	return resAllTrans, nil

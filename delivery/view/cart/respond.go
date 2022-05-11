@@ -2,14 +2,28 @@ package cart
 
 import (
 	"net/http"
-	"together/be8/entities"
+	"together/be8/delivery/view/address"
 )
 
+type RespondCart struct {
+	CartID      uint   `json:"cartId"`
+	ProductID   uint   `json:"productId"`
+	NameSeller  string `json:"nameSeller"`
+	NameProduct string `json:"nameProduct"`
+	Qty         int    `json:"qty"`
+	Price       int    `json:"price"`
+	ToBuy       string `json:"toBuy"`
+	UrlProduct  string `json:"urlProduct"`
+}
+
 type CartProduct struct {
-	NameProduct string `json:"nameProduct" validate:"required"`
-	Qty         int    `json:"qty" validate:"required"`
-	Price       int    `json:"price" validate:"required"`
-	ToBuy       string `json:"toBuy" validate:"required"`
+	CartID      uint   `json:"cartId"`
+	ProductID   uint   `json:"productId"`
+	NameProduct string `json:"nameProduct"`
+	Qty         int    `json:"qty"`
+	Price       int    `json:"price"`
+	ToBuy       string `json:"toBuy"`
+	UrlProduct  string `json:"urlProduct"`
 }
 
 type GetCart struct {
@@ -19,7 +33,7 @@ type GetCart struct {
 }
 
 type Shipment struct {
-	Address   entities.Address `json:"address"`
+	Address   address.RespondAddress `json:"address"`
 	Product   []GetCart
 	BillTotal int `json:"billTotal"`
 }
@@ -43,7 +57,7 @@ func StatusGetIdOk(data interface{}) map[string]interface{} {
 	}
 }
 
-func StatusCreate(data entities.Cart) map[string]interface{} {
+func StatusCreate(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusCreated,
 		"message": "Success Create Cart",
@@ -52,7 +66,7 @@ func StatusCreate(data entities.Cart) map[string]interface{} {
 	}
 }
 
-func StatusUpdate(data entities.Cart) map[string]interface{} {
+func StatusUpdate(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
 		"message": "Updated",

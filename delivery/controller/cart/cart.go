@@ -6,6 +6,7 @@ import (
 	"strconv"
 	middlewares "together/be8/delivery/middleware"
 	"together/be8/delivery/view"
+	"together/be8/delivery/view/address"
 	cartV "together/be8/delivery/view/cart"
 
 	"together/be8/entities"
@@ -56,7 +57,16 @@ func (r *ControlCart) CreateCart() echo.HandlerFunc {
 			log.Warn(errCreate)
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}
-		return c.JSON(http.StatusCreated, cartV.StatusCreate(result))
+		response := cartV.RespondCart{
+			CartID:      result.ID,
+			ProductID:   result.ProductID,
+			NameSeller:  result.NameSeller,
+			NameProduct: result.NameProduct,
+			Qty:         result.Qty,
+			Price:       result.Price,
+			ToBuy:       result.ToBuy,
+		}
+		return c.JSON(http.StatusCreated, cartV.StatusCreate(response))
 	}
 }
 
@@ -79,7 +89,7 @@ func (r *ControlCart) GetAllCart() echo.HandlerFunc {
 			subTotal := 0
 			for _, v := range result {
 				if v.NameSeller == NameSeller {
-					product := cartV.CartProduct{NameProduct: v.NameProduct, Qty: v.Qty, Price: v.Price, ToBuy: v.ToBuy}
+					product := cartV.CartProduct{CartID: v.ID, ProductID: v.ProductID, NameProduct: v.NameProduct, Qty: v.Qty, Price: v.Price, ToBuy: v.ToBuy}
 					addProduct = append(addProduct, product)
 					if _, ok := cek[v.ID]; !ok {
 						if v.ToBuy == "yes" {
@@ -120,7 +130,18 @@ func (r *ControlCart) UpdateCart() echo.HandlerFunc {
 			log.Warn(errNotFound)
 			return c.JSON(http.StatusNotFound, view.NotFound())
 		}
-		return c.JSON(http.StatusOK, cartV.StatusUpdate(result))
+
+		response := cartV.RespondCart{
+			CartID:      result.ID,
+			ProductID:   result.ProductID,
+			NameSeller:  result.NameSeller,
+			NameProduct: result.NameProduct,
+			Qty:         result.Qty,
+			Price:       result.Price,
+			ToBuy:       result.ToBuy,
+		}
+
+		return c.JSON(http.StatusOK, cartV.StatusUpdate(response))
 	}
 }
 
@@ -148,11 +169,23 @@ func (r *ControlCart) DeleteCart() echo.HandlerFunc {
 func (r *ControlCart) Shipment() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		UserID := middlewares.ExtractTokenUserId(c)
-		address, Cart, seller, err := r.Repo.Shipment(uint(UserID))
-
+		Addr, Cart, seller, err := r.Repo.Shipment(uint(UserID))
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}
+
+		AddressRes := address.RespondAddress{
+			AddressID:      Addr.ID,
+			Recipient:      Addr.Recipient,
+			HP:             Addr.HP,
+			Street:         Addr.Street,
+			SubDistrict:    Addr.SubDistrict,
+			UrbanVillage:   Addr.UrbanVillage,
+			City:           Addr.City,
+			Zip:            Addr.Zip,
+			AddressDefault: Addr.AddressDefault,
+		}
+
 		var data cartV.GetCart
 		var res []cartV.GetCart
 		var totalbill int
@@ -162,7 +195,7 @@ func (r *ControlCart) Shipment() echo.HandlerFunc {
 			subTotal := 0
 			for _, v := range Cart {
 				if v.NameSeller == NameSeller {
-					product := cartV.CartProduct{NameProduct: v.NameProduct, Qty: v.Qty, Price: v.Price, ToBuy: v.ToBuy}
+					product := cartV.CartProduct{CartID: v.ID, ProductID: v.ProductID, NameProduct: v.NameProduct, Qty: v.Qty, Price: v.Price, ToBuy: v.ToBuy}
 					addProduct = append(addProduct, product)
 					if _, ok := cek[v.ID]; !ok {
 						if v.ToBuy == "yes" {
@@ -179,7 +212,7 @@ func (r *ControlCart) Shipment() echo.HandlerFunc {
 			data.SubTotal = subTotal
 			res = append(res, data)
 		}
-		Shipment := cartV.Shipment{Address: address, Product: res, BillTotal: totalbill}
+		Shipment := cartV.Shipment{Address: AddressRes, Product: res, BillTotal: totalbill}
 		return c.JSON(http.StatusOK, cartV.ShipmentOk(Shipment))
 	}
 }

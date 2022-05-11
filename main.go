@@ -56,5 +56,6 @@ func main() {
 	e := echo.New()
 	// Akses Path Addressss
 	routes.Path(e, userControl, AddressControl, cartControl, transControl, categoryControl, productControl)
+	config.Migrate()
 	e.Logger.Fatal(e.Start(":8000"))
 }

@@ -98,7 +98,15 @@ func (t *ControlTrans) PayTransaction() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}
-		return c.JSON(http.StatusOK, transV.StatusPayTrans(result))
+		resTrans := transV.RespondTransaction{
+			OrderID:       result.OrderID,
+			TotalBill:     result.TotalBill,
+			PaymentMethod: result.PaymentMethod,
+			Address:       result.Address,
+			Status:        result.Status,
+			CreatedAt:     result.CreatedAt,
+		}
+		return c.JSON(http.StatusOK, transV.StatusPayTrans(resTrans))
 	}
 }
 
