@@ -43,7 +43,7 @@ func (t *ControlTrans) CreateTransaction() echo.HandlerFunc {
 		}
 		UserID := middlewares.ExtractTokenUserId(c)
 
-		NewTransaction := entities.Transaction{UserID: uint(UserID), PaymentMethod: InsertTransaction.PaymentMethod}
+		NewTransaction := entities.Transaction{UserID: uint(UserID), PaymentMethod: InsertTransaction.Address}
 		fmt.Println(NewTransaction)
 		result, err := t.repo.CreateTransaction(NewTransaction)
 		if err != nil {
@@ -54,10 +54,10 @@ func (t *ControlTrans) CreateTransaction() echo.HandlerFunc {
 		SnapRedirectUrl := t.midtrans.CreateTransaction(result.OrderID, int64(result.TotalBill))
 		if SnapRedirectUrl == nil {
 			log.Warn("Failured Get Redirect Url")
-			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
+			return c.JSON(http.StatusNoContent, transV.StatusErrorSnap())
 		}
 
-		return c.JSON(http.StatusCreated, transV.StatusCreate(result, SnapRedirectUrl))
+		return c.JSON(http.StatusCreated, transV.StatusCreate(result.OrderID, SnapRedirectUrl))
 	}
 }
 
@@ -83,8 +83,9 @@ func (t *ControlTrans) GetTransactionDetail() echo.HandlerFunc {
 		result, err := t.repo.GetTransactionDetail(uint(UserID), orderID)
 		if err != nil {
 			log.Warn(err)
+			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 		}
-		return c.JSON(http.StatusOK, transV.StatusGetOrderOk(result))
+		return c.JSON(http.StatusOK, transV.StatusTransactionDetail(result))
 	}
 }
 

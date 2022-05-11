@@ -9,12 +9,12 @@ import (
 )
 
 type AppConfig struct {
-	Port   int16
-	DBPort int16
-	Host   string
-	User   string
-
-	DBName string
+	Port     int16
+	DBPort   int16
+	Host     string
+	User     string
+	Password string
+	DBName   string
 }
 
 func InitConfig() *AppConfig {
@@ -42,7 +42,7 @@ func GetConfig() *AppConfig {
 	res.DBPort = int16(conv)
 	res.Host = os.Getenv("HOST")
 	res.User = os.Getenv("NAMEUSER")
-
+	res.Password = os.Getenv("PASSWORD")
 	res.DBName = os.Getenv("DBNAME")
 	return &res
 }

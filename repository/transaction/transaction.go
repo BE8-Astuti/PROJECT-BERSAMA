@@ -20,36 +20,18 @@ func NewTransDB(DB *gorm.DB) *TransDB {
 	}
 }
 
-func (t *TransDB) Shipment(UserID uint) (entities.Address, []entities.Cart, []string, error) {
-	var Address entities.Address
-	var Cart []entities.Cart
-	Seller := []string{}
-	if err := t.Db.Where("user_id=? AND address_default='yes'", UserID).First(&Address).Error; err != nil {
-		return Address, Cart, Seller, err
-	}
-	if err := t.Db.Where("user_id=? AND to_buy='yes'", UserID).Find(&Cart).Error; err != nil {
-		return Address, Cart, Seller, err
-	}
-	if err := t.Db.Table("carts").Where("user_id = ? AND to_buy='yes'", UserID).Select("name_seller").Distinct("name_seller").Order("created_at DESC").Find(&Seller).Error; err != nil {
-		log.Warn("Error Get All Cart", err)
-		return Address, Cart, Seller, err
-	}
-	return Address, Cart, Seller, nil
-}
-
 // CREATE NEW TRANSACTION
 func (t *TransDB) CreateTransaction(NewTransaction entities.Transaction) (entities.Transaction, error) {
-	address, carts, _, err := t.Shipment(NewTransaction.UserID)
-	if err != nil {
-		log.Warn(err)
-		return entities.Transaction{}, err
+	var Carts []entities.Cart
+
+	if err := t.Db.Where("user_id=? AND to_buy='yes'", NewTransaction.UserID).Find(&Carts).Error; err != nil {
+		return NewTransaction, err
 	}
 	var totalbill int
-	for _, v := range carts {
+	for _, v := range Carts {
 		totalbill += v.Qty * v.Price
 	}
-	NewTransaction.Address = address.Street + " " + address.SubDistrict + " " + address.City
-	NewTransaction.OrderID = fmt.Sprintf("Order-%d%d", int(NewTransaction.UserID), int(carts[0].ID))
+	NewTransaction.OrderID = fmt.Sprintf("Order-%d%d", int(NewTransaction.UserID), int(Carts[0].ID))
 	NewTransaction.TotalBill = totalbill
 	var cart entities.Cart
 	if err := t.Db.Table("carts").Where("to_buy='yes' AND deleted_at IS NULL").Update("order_id", NewTransaction.OrderID).Error; err != nil {
@@ -91,7 +73,6 @@ func (t *TransDB) GetAllTransaction(UserID uint) ([]transaction.AllTrans, error)
 		resTrans.Product = cards
 		resAllTrans = append(resAllTrans, resTrans)
 	}
-
 	return resAllTrans, nil
 }
 

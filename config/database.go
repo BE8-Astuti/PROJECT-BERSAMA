@@ -13,6 +13,7 @@ func InitDB() *gorm.DB {
 	config := InitConfig()
 	conString := fmt.Sprintf("%s:@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True",
 		config.User,
+		// config.Password,
 		config.Host,
 		config.DBPort,
 		config.DBName,
