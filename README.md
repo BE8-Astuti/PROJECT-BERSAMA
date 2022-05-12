@@ -3,9 +3,16 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="https://media.giphy.com/media/Qs1HLJYCcNgUP1Zd5Z/giphy.gif" alt="Logo" width="250" height="200">
+ <img src="https://media.giphy.com/media/f8bVNLbLFQfUSsoaoP/giphy.gif" width="250" height="250"/>
+ </div>
+ 
+ <p align=center>
+  <a href="https://github.com/astutirahmawati">
+    <img src="https://badges.pufler.dev/visits/astutirahmawati/astutirahmawati??style=plastic&color=tosca&logo=github">
+    
   </a>
+  <a href="https://github.com/astutirahmawati"><img src="https://img.shields.io/github/followers/astutirahmawati?style=social">
+     </a>
   <h1 align="center">E-COMMERCE PROJECT</h1>
 
   <p align="center">
