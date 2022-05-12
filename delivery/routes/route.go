@@ -36,6 +36,7 @@ func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.
 
 	product := e.Group("/product")
 	product.POST("", p.InsertProd(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	product.GET("", p.GetAllProduct())
 	product.GET("/:id", p.GetProID())
 	product.PUT("/:id", p.UpdateProduk(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	product.DELETE("/:id", p.DeleteProduk(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))

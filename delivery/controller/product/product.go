@@ -75,6 +75,31 @@ func (pc *ProdukController) InsertProd() echo.HandlerFunc {
 	}
 }
 
+func (pc *ProdukController) GetAllProduct() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		res, err := pc.Repo.GetAllProduct()
+		if err != nil {
+			log.Warn(err)
+			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
+		}
+		var GetAll []vproduk.RespondProduct
+		for _, v := range res {
+			response := vproduk.RespondProduct{
+				ProductID:   v.ID,
+				UserID:      v.UserID,
+				CategoryID:  v.CategoryID,
+				Name:        v.Name,
+				NameSeller:  v.NameSeller,
+				Stock:       v.Stock,
+				Price:       v.Price,
+				Description: v.Description,
+			}
+			GetAll = append(GetAll, response)
+		}
+		return c.JSON(http.StatusOK, vproduk.StatusGetAllOk(GetAll))
+	}
+}
+
 func (pc *ProdukController) GetProdukbySeller() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")

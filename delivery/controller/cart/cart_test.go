@@ -125,10 +125,7 @@ func TestCreateCart(t *testing.T) {
 	t.Run("Error Validate", func(t *testing.T) {
 		e := echo.New()
 		requestBody, _ := json.Marshal(map[string]interface{}{
-			"productId":   3,
-			"nameSeller":  "Elec Center",
-			"nameProduct": "Mouse",
-			"qty":         3,
+			"productId": 3,
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)

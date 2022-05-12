@@ -159,6 +159,63 @@ func TestInsertProd(t *testing.T) {
 	})
 }
 
+func TestGetAllProduct(t *testing.T) {
+	t.Run("Success Get All Product", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/product")
+
+		Produk := New(&mockProduct{}, validator.New())
+
+		Produk.GetAllProduct()(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+			Data    interface{}
+		}
+
+		var result Response
+
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+		assert.Equal(t, 200, result.Code)
+		assert.Equal(t, "Success Get All Data", result.Message)
+		assert.True(t, result.Status)
+		assert.NotNil(t, result.Data)
+	})
+	t.Run("Success Get All Product", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/product")
+
+		Produk := New(&errMockProduct{}, validator.New())
+
+		Produk.GetAllProduct()(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 500, result.Code)
+		assert.Equal(t, "Cannot Access Database", result.Message)
+		assert.False(t, result.Status)
+	})
+}
+
 func TestGetProdbyID(t *testing.T) {
 	t.Run("Success Get Produk By ID", func(t *testing.T) {
 		e := echo.New()
@@ -361,7 +418,7 @@ func TestGetProdukByCategory(t *testing.T) {
 
 		json.Unmarshal([]byte(res.Body.Bytes()), &result)
 		assert.Equal(t, 200, result.Code)
-		assert.Equal(t, "Success Get All data", result.Message)
+		assert.Equal(t, "Success Get All Data", result.Message)
 		assert.True(t, result.Status)
 		assert.NotNil(t, result.Data)
 	})
@@ -640,6 +697,10 @@ func (s *mockProduct) InsertProduk(newProduk entities.Product) (entities.Product
 	return entities.Product{UserID: 1, CategoryID: 1, Name: "tango", Stock: 10, Price: 10000, Description: "wafer coklat"}, nil
 }
 
+func (s *mockProduct) GetAllProduct() ([]entities.Product, error) {
+	return []entities.Product{{Name: "Baju"}, {Name: "Celana"}}, nil
+}
+
 func (s *mockProduct) GetProdbyID(id uint) (entities.Product, error) {
 	return entities.Product{UserID: 1, CategoryID: 1, Name: "tango", Stock: 10, Price: 10000, Description: "wafer coklat"}, nil
 }
@@ -662,6 +723,10 @@ type errMockProduct struct{}
 
 func (d *errMockProduct) InsertProduk(newProduk entities.Product) (entities.Product, error) {
 	return entities.Product{}, errors.New("Access Database Error")
+}
+
+func (d *errMockProduct) GetAllProduct() ([]entities.Product, error) {
+	return []entities.Product{}, errors.New("Access Database Error")
 }
 
 func (d *errMockProduct) GetProdbyID(id uint) (entities.Product, error) {

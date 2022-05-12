@@ -28,6 +28,15 @@ func (pr *ProdukRepo) InsertProduk(newProduk entities.Product) (entities.Product
 	return newProduk, nil
 }
 
+func (pr *ProdukRepo) GetAllProduct() ([]entities.Product, error) {
+	var produks []entities.Product
+	if err := pr.Db.Find(&produks).Error; err != nil {
+		log.Warn("Errorr Get All Product", err)
+		return produks, err
+	}
+	return produks, nil
+}
+
 func (pr *ProdukRepo) GetProdBySeller(UserID uint) ([]entities.Product, error) {
 	var produks []entities.Product
 	if err := pr.Db.Where("user_id = ?", UserID).Find(&produks).Error; err != nil {

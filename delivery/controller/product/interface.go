@@ -9,4 +9,5 @@ type ProductControl interface {
 	GetProdukByCategory() echo.HandlerFunc
 	UpdateProduk() echo.HandlerFunc
 	DeleteProduk() echo.HandlerFunc
+	GetAllProduct() echo.HandlerFunc
 }

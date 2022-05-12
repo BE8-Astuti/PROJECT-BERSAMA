@@ -20,7 +20,7 @@ type RespondProduct struct {
 func StatusGetAllOk(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
-		"message": "Success Get All data",
+		"message": "Success Get All Data",
 		"status":  true,
 		"data":    data,
 	}
