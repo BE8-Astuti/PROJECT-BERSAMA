@@ -26,7 +26,7 @@ func StatusGetIdOk(data interface{}) map[string]interface{} {
 func StatusCreate(data entities.Category) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusCreated,
-		"message": "Success Create Categori",
+		"message": "Success Create Category",
 		"status":  true,
 		"data":    data,
 	}

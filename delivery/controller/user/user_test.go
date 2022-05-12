@@ -36,7 +36,6 @@ func TestInsertUser(t *testing.T) {
 		})
 		req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(string(requestBody)))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON) // Set Content to JSON
-		// req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
 
 		res := httptest.NewRecorder()
 		context := e.NewContext(req, res)
@@ -55,7 +54,7 @@ func TestInsertUser(t *testing.T) {
 		var resp response
 
 		json.Unmarshal([]byte(res.Body.Bytes()), &resp)
-		assert.Equal(t, "berhasil insert data user", resp.Message)
+		assert.Equal(t, "Success Register", resp.Message)
 		assert.True(t, resp.Status)
 		assert.Equal(t, 201, resp.Code)
 		assert.NotNil(t, resp.Data)
