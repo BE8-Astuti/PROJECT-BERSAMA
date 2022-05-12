@@ -10,8 +10,7 @@
   <h1 align="center">E-COMMERCE PROJECT</h1>
 
   <p align="center">
-    A Collaboration Project Between Backend & Frontend in Immersive Alta Batch8!
-     <img src="https://media.giphy.com/media/hvRJCLFzcasrR4ia7z/giphy.gif" width="30px"/>
+   :collision: A Collaboration Project Between Backend & Frontend in Immersive Alta Batch8 :collision:
     <br />
     <a href="https://github.com/BE8-Astuti/PROJECT-BERSAMA"><strong>Explore the docs »</strong></a>
     <br />
@@ -56,7 +55,7 @@
 ## About The Project
 
 Projek ini merupakan projek kolaborasi antara Backend dan Frontend di progam Immersive Alterra Batch 8. Namun, dalam repo ini khusus berisi hal-hal yang dikerjakan oleh Backend. 
-Deskripsi tentang project ini dapat dibaca di link berikut: --> [Deskripsi Project](https://docs.google.com/document/d/1mb8QTb7J77r6rzJwned63H-IVdV20v12ugN365ET9tg/edit).
+Deskripsi tentang project ini dapat dibaca di link berikut --> [Deskripsi Project](https://docs.google.com/document/d/1mb8QTb7J77r6rzJwned63H-IVdV20v12ugN365ET9tg/edit).
 Repo backend ini dikerjakan oleh [Galih](https://github.com/galihgpr) dan [Astuti](https://github.com/astutirahmawati). Hal-hal yang telah Backend lakukan sebagai berikut:
 * Pengerjaan Entity Relation Design (ERD) secara bersama-sama
 * Pengerjaan OPEN API dilakukan pembagian tugas
@@ -64,49 +63,42 @@ Repo backend ini dikerjakan oleh [Galih](https://github.com/galihgpr) dan [Astut
 * Deployment
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-### Built With
+:star2: Built With
 
-Projek ini membutuhkan beberapa instalasi software seperti:
+Projek ini membutuhkan beberapa instalasi seperti:
 
 * [Vs Code](https://code.visualstudio.com/)
 * [Insomnia](https://insomnia.rest/)
 * [Dbeaver](https://dbeaver.io/)
+* [Golang](https://go.dev/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
-
-### Prerequisites
-
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+Pastikan golang dan mySQL sudah terinstall di device Anda
 
 ### Installation
 
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
-
-1. Get a free API Key at [https://example.com](https://example.com)
+1. Get a free API :fire: Key at [https://app.swaggerhub.com/apis/galihgpr/onlineshop-api-access-project/1.0.0](https://app.swaggerhub.com/apis/galihgpr/onlineshop-api-access-project/1.0.0)
 2. Clone the repo
    ```sh
-   git clone https://github.com/your_username_/Project-Name.git
+   git clone https://github.com/BE8-Astuti/PROJECT-BERSAMA.git
    ```
-3. Install NPM packages
+3. Hapus folder .git yang terdapat di repository cloning dengan menjalankan
    ```sh
-   npm install
+   rm -rf .git
+   ``` 
+4. Buka repository cloning menggunakan code editor yang ada di device anda atau dengan menjalankan 
+   ```sh
+   code . (di terminal)
    ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+ 5. Untuk mencoba program kami, jalan lupa untuk menjalankan 
+     ```sh
+     go run main.go
+     ```
+ <p align="right">(<a href="#top">back to top</a>)</p>
 
 
 <!-- USAGE EXAMPLES -->
@@ -121,10 +113,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 <!-- CONTRIBUTING -->
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
+Apabila Anda memiliki saran untuk pengembangan projek ini lebih baik, silahkan push kontibusi anda ke branch baru. Terimakasih 😊
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -146,7 +135,7 @@ Project Link: [https://github.com/BE8-Astuti/PROJECT-BERSAMA](https://github.com
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-Kami sangat berterima kasih atas bantuan dan arahan dari mentor- mentor serta tim frontend di Immersive Altera Academy Batch 8 yaitu:
+Kami sangat berterima kasih atas bantuan dan arahan dari mentor- mentor serta tim frontend di Immersive Altera Academy Batch 8 :pray::pray:
 
 * [Jerry Young](https://github.com/jackthepanda96)
 * [Nur Fitiana](https://github.com/nurfitriana87)
