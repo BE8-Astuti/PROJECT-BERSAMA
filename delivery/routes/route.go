@@ -16,9 +16,7 @@ func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization, echo.MIMEApplicationJSON},
-	}))
+	e.Use(middleware.CORS())
 	// Login
 	e.POST("/login", u.Login())
 	// ROUTES USER
