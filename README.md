@@ -139,7 +139,7 @@ Don't forget to give the project a star! Thanks again!
 * Galih - [https://github.com/galihgpr](https://github.com/galihgpr) 
 * Astuti - [https://github.com/astutirahmawati](https://github.com/astutirahmawati) 
 
-Project Link: [https://github.com/BE8-Astuti/PROJECT-BERSAMA.git](https://github.com/BE8-Astuti/PROJECT-BERSAMA)
+Project Link: [https://github.com/BE8-Astuti/PROJECT-BERSAMA](https://github.com/BE8-Astuti/PROJECT-BERSAMA)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
