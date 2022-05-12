@@ -19,7 +19,7 @@ type RespondUser struct {
 func SuccessInsert(data interface{}) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusCreated,
-		"message": "berhasil insert data user",
+		"message": "Success Register",
 		"status":  true,
 		"data":    data,
 	}
@@ -28,16 +28,16 @@ func SuccessInsert(data interface{}) map[string]interface{} {
 func BadRequest() map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusBadRequest,
-		"message": "terdapat kesalahan pada input data user",
+		"message": "Bad Request Access",
 		"status":  false,
 		"data":    nil,
 	}
 }
 
-func LoginOK(data LoginResponse, message string) map[string]interface{} {
+func LoginOK(data LoginResponse) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
-		"message": message,
+		"message": "Success Login",
 		"status":  true,
 		"data":    data,
 	}

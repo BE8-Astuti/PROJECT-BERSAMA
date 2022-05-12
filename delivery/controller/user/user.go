@@ -145,10 +145,10 @@ func (uc *UserController) Login() echo.HandlerFunc {
 		if res.Token == "" {
 			token, _ := middlewares.CreateToken(float64(hasil.ID), (hasil.Name), (hasil.Email))
 			res.Token = token
-			return c.JSON(http.StatusOK, userview.LoginOK(res, "Berhasil login"))
+			return c.JSON(http.StatusOK, userview.LoginOK(res))
 		}
 
-		return c.JSON(http.StatusOK, userview.LoginOK(res, "Berhasil login"))
+		return c.JSON(http.StatusOK, userview.LoginOK(res))
 	}
 }
 
