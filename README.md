@@ -19,14 +19,14 @@
     A Collaboration Project Between Backend & Frontend in Immersive Alta Batch8!
      <img src="https://media.giphy.com/media/hvRJCLFzcasrR4ia7z/giphy.gif" width="30px"/>
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/BE8-Astuti/PROJECT-BERSAMA"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
+    <a href="https://github.com/BE8-Astuti/PROJECT-BERSAMA.git">View Demo</a>
     ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Report Bug</a>
+    <a href="https://github.com/BE8-Astuti/PROJECT-BERSAMA.git/issues">Report Bug</a>
     ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Request Feature</a>
+    <a href="https://github.com/BE8-Astuti/PROJECT-BERSAMA.git/issues">Request Feature</a>
   </p>
 </div>
 
