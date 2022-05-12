@@ -122,3 +122,27 @@ func (t *ControlTrans) CancelTransaction() echo.HandlerFunc {
 		return c.JSON(http.StatusOK, transV.StatusCancelTrans())
 	}
 }
+
+// RESPONSE FINISH
+func (t *ControlTrans) FinishPayment() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		order := c.FormValue("order_id")
+		newStatus := t.midtrans.FinishPayment(order)
+
+		trans := entities.Transaction{PaymentMethod: newStatus.PaymentType, Status: newStatus.TransactionStatus}
+		res, err := t.repo.FinishPayment(order, trans)
+		if err != nil {
+			log.Warn(err)
+			c.JSON(http.StatusInternalServerError, view.InternalServerError())
+		}
+		result := transV.RespondTransaction{
+			OrderID:       res.OrderID,
+			TotalBill:     res.TotalBill,
+			PaymentMethod: res.PaymentMethod,
+			Address:       res.Address,
+			Status:        res.Status,
+			CreatedAt:     res.CreatedAt,
+		}
+		return c.JSON(http.StatusOK, transV.StatusUpdateTransaction(result))
+	}
+}

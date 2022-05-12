@@ -415,6 +415,63 @@ func TestCancelTransaction(t *testing.T) {
 	})
 }
 
+// TEST FINISH PAYMENT
+func TestFinishPayment(t *testing.T) {
+	t.Run("Success Update Transaction", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/transaction?order_id=order-123")
+
+		GetTransaction := NewRepoTrans(&mockTransaction{}, validator.New(), &MockSnap{})
+		GetTransaction.FinishPayment()(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 200, result.Code)
+		assert.Equal(t, "Success Update Transaction Status", result.Message)
+		assert.True(t, result.Status)
+	})
+	t.Run("Error Cancel Transaction", func(t *testing.T) {
+		e := echo.New()
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req.Header.Set(echo.HeaderAuthorization, "Bearer "+token)
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/transaction?order_id=order-123")
+
+		GetTransaction := NewRepoTrans(&errMockTransaction{}, validator.New(), &MockSnap{})
+
+		middleware.JWTWithConfig(middleware.JWTConfig{SigningMethod: "HS256", SigningKey: []byte("TOGETHER")})(GetTransaction.CancelTransaction())(context)
+
+		type Response struct {
+			Code    int
+			Message string
+			Status  bool
+		}
+
+		var result Response
+		json.Unmarshal([]byte(res.Body.Bytes()), &result)
+
+		assert.Equal(t, 500, result.Code)
+		assert.Equal(t, "Cannot Access Database", result.Message)
+		assert.False(t, result.Status)
+	})
+}
+
 type MockSnap struct {
 }
 
@@ -440,8 +497,16 @@ func (m *mockTransaction) CancelTransaction(UserID uint, OrderID string) error {
 	return nil
 }
 
+func (m *mockTransaction) FinishPayment(OrderID string, updateStatus entities.Transaction) (entities.Transaction, error) {
+	return entities.Transaction{OrderID: "Order-1"}, nil
+}
+
 func (m *MockSnap) CreateTransaction(OrderID string, GrossAmt int64) map[string]interface{} {
 	return map[string]interface{}{"Token": "HanyaMock"}
+}
+
+func (m *MockSnap) FinishPayment(OrderID string) transaction.ResponsePayment {
+	return transaction.ResponsePayment{TransactionStatus: "Settlement"}
 }
 
 // MOCK ERROR
@@ -469,9 +534,17 @@ func (e *errMockTransaction) CancelTransaction(UserID uint, OrderID string) erro
 	return errors.New("Access Database Error")
 }
 
+func (e *errMockTransaction) FinishPayment(OrderID string, updateStatus entities.Transaction) (entities.Transaction, error) {
+	return entities.Transaction{}, errors.New("Access Database Error")
+}
+
 type errMockSnap struct {
 }
 
 func (e *errMockSnap) CreateTransaction(OrderID string, GrossAmt int64) map[string]interface{} {
 	return nil
+}
+
+func (e *errMockSnap) FinishPayment(OrderID string) transaction.ResponsePayment {
+	return transaction.ResponsePayment{}
 }

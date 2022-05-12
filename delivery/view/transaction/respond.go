@@ -29,6 +29,12 @@ type AllTrans struct {
 	Product     []ProductTransaction
 }
 
+type ResponsePayment struct {
+	StatusCode        string `json:"status_code"`
+	PaymentType       string `json:"payment_type"`
+	TransactionStatus string `json:"transaction_status"`
+}
+
 func StatusGetAllOk(data []AllTrans) map[string]interface{} {
 	return map[string]interface{}{
 		"code":    http.StatusOK,
@@ -78,5 +84,14 @@ func StatusErrorSnap() map[string]interface{} {
 		"code":    http.StatusNoContent,
 		"message": "Error Get Redirect Url Payment",
 		"status":  false,
+	}
+}
+
+func StatusUpdateTransaction(data interface{}) map[string]interface{} {
+	return map[string]interface{}{
+		"code":    http.StatusOK,
+		"message": "Success Update Transaction Status",
+		"status":  true,
+		"data":    data,
 	}
 }

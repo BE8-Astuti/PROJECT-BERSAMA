@@ -133,3 +133,13 @@ func (t *TransDB) CancelTransaction(UserID uint, OrderID string) error {
 	}
 	return nil
 }
+
+// FINISH PAYMENT
+func (t *TransDB) FinishPayment(OrderID string, updateStatus entities.Transaction) (entities.Transaction, error) {
+	var result entities.Transaction
+	if err := t.Db.Where("order_id = ?", OrderID).Updates(&updateStatus).Find(&result).Error; err != nil {
+		log.Warn(err)
+		return updateStatus, errors.New("Access Database Error")
+	}
+	return result, nil
+}

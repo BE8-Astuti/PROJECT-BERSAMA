@@ -8,4 +8,5 @@ type TransController interface {
 	GetTransactionDetail() echo.HandlerFunc
 	PayTransaction() echo.HandlerFunc
 	CancelTransaction() echo.HandlerFunc
+	FinishPayment() echo.HandlerFunc
 }

@@ -46,7 +46,7 @@ func (r *ControlCart) CreateCart() echo.HandlerFunc {
 		UserID := middlewares.ExtractTokenUserId(c)
 		NewAdd := entities.Cart{
 			UserID:    uint(UserID),
-			ProductID: uint(Insert.ProductID),
+			ProductID: Insert.ProductID,
 			Qty:       Insert.Qty,
 		}
 		result, errCreate := r.Repo.CreateCart(NewAdd)

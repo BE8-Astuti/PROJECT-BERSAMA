@@ -11,4 +11,5 @@ type RepoTrans interface {
 	GetTransactionDetail(UserID uint, OrderID string) (transaction.AllTrans, error)
 	PayTransaction(UserID uint, OrderID string) (entities.Transaction, error)
 	CancelTransaction(UserID uint, OrderID string) error
+	FinishPayment(OrderID string, updateStatus entities.Transaction) (entities.Transaction, error)
 }
