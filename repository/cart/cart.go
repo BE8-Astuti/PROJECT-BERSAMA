@@ -20,6 +20,14 @@ func NewRepoCart(DB *gorm.DB) *RepoCart {
 
 // CREATE NEW CART
 func (r *RepoCart) CreateCart(NewCart entities.Cart) (entities.Cart, error) {
+	var product entities.Product
+	if err := r.Db.Where("id = ?", NewCart.ProductID).First(&product).Error; err != nil {
+		log.Warn(err)
+		return NewCart, errors.New("Access Database Error")
+	}
+	NewCart.NameProduct = product.Name
+	NewCart.NameSeller = product.NameSeller
+	NewCart.Price = product.Price
 	if err := r.Db.Create(&NewCart).Error; err != nil {
 		log.Warn(err)
 		return NewCart, err

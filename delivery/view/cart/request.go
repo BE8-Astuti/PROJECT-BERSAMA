@@ -1,11 +1,8 @@
 package cart
 
 type InsertCart struct {
-	NameSeller  string `json:"nameSeller" validate:"required"`
-	NameProduct string `json:"nameProduct" validate:"required"`
-	Qty         int    `json:"qty" validate:"required"`
-	Price       int    `json:"price" validate:"required"`
-	ProductID   uint   `json:"productId" validate:"required"`
+	ProductID uint `json:"productId" validate:"required"`
+	Qty       int  `json:"qty" validate:"required"`
 }
 
 type UpdateCart struct {

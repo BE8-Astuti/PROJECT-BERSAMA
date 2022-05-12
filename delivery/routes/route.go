@@ -35,12 +35,12 @@ func Path(e *echo.Echo, u user.ControllerUser, a address.AddressControl, c cart.
 	category.GET("/:id", cat.GetCategoryID())
 
 	product := e.Group("/product")
+	product.POST("", p.InsertProd(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
+	product.GET("/:id", p.GetProID())
 	product.PUT("/:id", p.UpdateProduk(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	product.DELETE("/:id", p.DeleteProduk(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
-	product.POST("", p.InsertProd(), middleware.JWTWithConfig(middleware.JWTConfig{SigningKey: []byte("TOGETHER")}))
 	product.GET("/user/:id", p.GetProdukbySeller())
 	product.GET("/category/:id", p.GetProdukByCategory())
-	product.GET("/:id", p.GetProID())
 
 	// Routes Addressy
 	Address := e.Group("/address")
