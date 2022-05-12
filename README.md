@@ -6,13 +6,7 @@
  <img src="https://media.giphy.com/media/uZ7wLTpoMbtikW2wUY/giphy.gif" width="250" height="250"/>
  </div>
  
- <p align=center>
-  <a href="https://github.com/astutirahmawati">
-    <img src="https://badges.pufler.dev/visits/astutirahmawati/astutirahmawati??style=plastic&color=tosca&logo=github">
-    
-  </a>
-  <a href="https://github.com/astutirahmawati"><img src="https://img.shields.io/github/followers/astutirahmawati?style=social">
-     </a>
+
   <h1 align="center">E-COMMERCE PROJECT</h1>
 
   <p align="center">
@@ -50,9 +44,9 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
+   
     <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
+
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
@@ -74,7 +68,7 @@ Repo backend ini dikerjakan oleh [Galih](https://github.com/galihgpr) dan [Astut
 <p align="right">(<a href="#top">back to top</a>)</p>
 ### Built With
 
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
+Projek ini membutuhkan beberapa instalasi software seperti:
 
 * [Vs Code](https://code.visualstudio.com/)
 * [Insomnia](https://insomnia.rest/)
