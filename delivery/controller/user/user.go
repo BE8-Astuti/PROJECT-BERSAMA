@@ -113,7 +113,7 @@ func (uc *UserController) UpdateUserID() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, view.InternalServerError())
 
 		}
-		response := userview.RespondUser{Name: res.Name, Username: res.Username, Email: res.Email, Phone: res.Phone, UserID: res.ID}
+		response := userview.RespondUser{Name: res.Name, Username: res.Username, Email: res.Email, Phone: res.Phone, UserID: res.ID, BirthDate: res.BirthDate, Gender: res.Gender}
 
 		return c.JSON(http.StatusOK, userview.StatusUpdate(response))
 	}

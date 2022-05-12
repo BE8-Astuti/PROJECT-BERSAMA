@@ -1,5 +1,7 @@
 package user
 
+import "time"
+
 type InsertUserRequest struct {
 	Name     string `json:"name" validate:"required"`
 	Email    string `json:"email" validate:"required" gorm:"unique"`
@@ -12,8 +14,10 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 type UpdateUserRequest struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Phone    string `json:"phone"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+	Phone     string    `json:"phone"`
+	BirthDate time.Time `json:"birthDate"`
+	Gender    string    `json:"jenisKelamin"`
 }
