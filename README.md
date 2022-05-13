@@ -80,20 +80,20 @@ Pastikan golang dan mySQL sudah terinstall di device Anda
 
 ### Installation
 
-1. Get a free API :fire: Key at [https://app.swaggerhub.com/apis/galihgpr/onlineshop-api-access-project/1.0.0](https://app.swaggerhub.com/apis/galihgpr/onlineshop-api-access-project/1.0.0)
-2. Clone the repo
+1. Clone the repo
    ```sh
    git clone https://github.com/BE8-Astuti/PROJECT-BERSAMA.git
+   ```
+2. Buka repository cloning menggunakan code editor yang ada di device anda atau dengan menjalankan 
+   ```sh
+   cd PROJECT-BERSAMA
    ```
 3. Hapus folder .git yang terdapat di repository cloning dengan menjalankan
    ```sh
    rm -rf .git
    ``` 
-4. Buka repository cloning menggunakan code editor yang ada di device anda atau dengan menjalankan 
-   ```sh
-   code . (di terminal)
-   ```
- 5. Untuk mencoba program kami, jalan lupa untuk menjalankan 
+
+4. Untuk mencoba program kami, jalan lupa untuk menjalankan 
      ```sh
      go run main.go
      ```
@@ -105,7 +105,8 @@ Pastikan golang dan mySQL sudah terinstall di device Anda
 
 Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+Simulation Apps With Free API  [https://app.swaggerhub.com/apis/galihgpr/onlineshop-api-access-project/1.0.0](https://app.swaggerhub.com/apis/galihgpr/onlineshop-api-access-project/1.0.0)
+
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

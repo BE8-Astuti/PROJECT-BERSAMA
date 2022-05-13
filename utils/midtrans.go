@@ -33,7 +33,7 @@ func (s *SnapMidtrans) CreateTransaction(OrderID string, GrossAmt int64) map[str
 			GrossAmt: GrossAmt,
 		},
 		Callbacks: &snap.Callbacks{
-			Finish: "http://54.179.30.163:8080/transaction/finish_payment",
+			Finish: fmt.Sprintf("http://54.179.30.163:8080/transaction/finish_payment"),
 		},
 	}
 	jsonReq, _ := json.Marshal(requestBody)
